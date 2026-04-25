@@ -111,8 +111,7 @@ public class StockTransactionRepository {
     // Return only the 10 most recent transactions (dashboard preview).
     // Hint: append "ORDER BY t.transaction_date DESC LIMIT 10"
     public List<StockTransaction> findTop10Recent() {
-        // TODO: use BASE_SELECT with ORDER BY ... LIMIT 10
-        throw new UnsupportedOperationException("TODO 5 — findTop10Recent not implemented yet");
+        return jdbcTemplate.query(BASE_SELECT + "ORDER BY t.transaction_date DESC LIMIT 10", rowMapper);
     }
 
     // ── TODO 6 ──────────────────────────────────────────────────────────────

@@ -39,8 +39,7 @@ public class StockTransactionService {
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Return only the 10 most recent transactions (used on the dashboard).
     public List<StockTransaction> getRecentTransactions() {
-        // TODO: return transactionRepository.findTop10Recent()
-        throw new UnsupportedOperationException("TODO 1 — getRecentTransactions not implemented yet");
+        return transactionRepository.findTop10Recent();
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────

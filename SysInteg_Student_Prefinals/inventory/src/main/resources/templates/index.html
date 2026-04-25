@@ -79,7 +79,7 @@
                     <a th:href="@{/products}" class="btn btn-sm btn-outline-secondary">View All</a>
                 </div>
                 <div class="card-body px-4">
-                    <table class="table table-sm table-hover mb-0" th:if="${!lowStockItems.isEmpty()}">
+                    <table class="table table-sm table-hover mb-0" th:if="${lowStockItems != null && !lowStockItems.isEmpty()}">
                         <thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Reorder At</th></tr></thead>
                         <tbody>
                             <tr th:each="p : ${lowStockItems}">
@@ -93,7 +93,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p class="text-muted text-center py-3 mb-0" th:if="${lowStockItems.isEmpty()}">
+                    <p class="text-muted text-center py-3 mb-0" th:if="${lowStockItems == null || lowStockItems.isEmpty()}">
                         <i class="bi bi-check-circle text-success me-1"></i>All stock levels are healthy!
                     </p>
                 </div>
@@ -107,7 +107,7 @@
                     <a th:href="@{/transactions}" class="btn btn-sm btn-outline-secondary">View All</a>
                 </div>
                 <div class="card-body px-4">
-                    <table class="table table-sm table-hover mb-0" th:if="${!recentTx.isEmpty()}">
+                    <table class="table table-sm table-hover mb-0" th:if="${recentTx != null && !recentTx.isEmpty()}">
                         <thead><tr><th>Product</th><th>Type</th><th>Qty</th><th>Date</th></tr></thead>
                         <tbody>
                             <tr th:each="tx : ${recentTx}">
@@ -121,7 +121,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p class="text-muted text-center py-3 mb-0" th:if="${recentTx.isEmpty()}">No transactions yet.</p>
+                    <p class="text-muted text-center py-3 mb-0" th:if="${recentTx == null || recentTx.isEmpty()}">No transactions yet.</p>
                 </div>
             </div>
         </div>

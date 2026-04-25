@@ -146,15 +146,13 @@ public class ProductRepository {
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity <= reorder_level (low stock alert).
     public List<Product> findLowStockProducts() {
-        // TODO: append "WHERE p.stock_quantity <= p.reorder_level ORDER BY p.stock_quantity"
-        throw new UnsupportedOperationException("TODO 5 — findLowStockProducts not implemented yet");
+        return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity <= p.reorder_level ORDER BY p.stock_quantity", rowMapper);
     }
 
     // ── TODO 6 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity = 0 (completely out of stock).
     public List<Product> findOutOfStock() {
-        // TODO: append "WHERE p.stock_quantity = 0 ORDER BY p.name"
-        throw new UnsupportedOperationException("TODO 6 — findOutOfStock not implemented yet");
+        return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity = 0 ORDER BY p.name", rowMapper);
     }
 
     // ── TODO 7 ──────────────────────────────────────────────────────────────
