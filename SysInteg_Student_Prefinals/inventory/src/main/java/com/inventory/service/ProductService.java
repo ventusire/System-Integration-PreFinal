@@ -1,12 +1,13 @@
 package com.inventory.service;
 
-import com.inventory.model.Product;
-import com.inventory.repository.ProductRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.inventory.model.Product;
+import com.inventory.repository.ProductRepository;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -53,15 +54,13 @@ public class ProductService {
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // Return all products that are at or below their reorder level.
     public List<Product> getLowStockProducts() {
-        // TODO: return productRepository.findLowStockProducts()
-        throw new UnsupportedOperationException("TODO 5 — getLowStockProducts not implemented yet");
+        return productRepository.findLowStockProducts();
     }
 
     // ── TODO 6 ──────────────────────────────────────────────────────────────
     // Return all products with zero stock.
     public List<Product> getOutOfStockProducts() {
-        // TODO: return productRepository.findOutOfStock()
-        throw new UnsupportedOperationException("TODO 6 — getOutOfStockProducts not implemented yet");
+        return productRepository.findOutOfStock();
     }
 
     // ── TODO 7 ──────────────────────────────────────────────────────────────

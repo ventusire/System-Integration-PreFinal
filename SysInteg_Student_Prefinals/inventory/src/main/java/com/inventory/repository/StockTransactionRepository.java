@@ -1,7 +1,12 @@
 package com.inventory.repository;
 
-import com.inventory.model.Product;
-import com.inventory.model.StockTransaction;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,12 +14,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.inventory.model.Product;
+import com.inventory.model.StockTransaction;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -111,8 +112,9 @@ public class StockTransactionRepository {
     // Return only the 10 most recent transactions (dashboard preview).
     // Hint: append "ORDER BY t.transaction_date DESC LIMIT 10"
     public List<StockTransaction> findTop10Recent() {
-        // TODO: use BASE_SELECT with ORDER BY ... LIMIT 10
-        throw new UnsupportedOperationException("TODO 5 — findTop10Recent not implemented yet");
+        return jdbcTemplate.query(
+            BASE_SELECT + "ORDER BY t.transaction_date DESC LIMIT 10",
+            rowMapper);
     }
 
     // ── TODO 6 ──────────────────────────────────────────────────────────────
@@ -142,8 +144,18 @@ public class StockTransactionRepository {
     //   reason           → tx.getReason()
     //   transaction_date → Timestamp.valueOf(tx.getTransactionDate())
     public StockTransaction save(StockTransaction tx) {
-        // TODO: write INSERT SQL, use KeyHolder to get generated id,
-        //       set tx.setId(...) and return tx
-        throw new UnsupportedOperationException("TODO 8 — save not implemented yet");
+        String sql = "INSERT INTO stock_transactions (product_id, type, quantity, reason, transaction_date) VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, tx.getProduct().getId());
+            ps.setString(2, tx.getType().name());
+            ps.setInt(3, tx.getQuantity());
+            ps.setString(4, tx.getReason());
+            ps.setTimestamp(5, Timestamp.valueOf(tx.getTransactionDate()));
+            return ps;
+        }, keyHolder);
+        tx.setId(keyHolder.getKey().longValue());
+        return tx;
     }
 }

@@ -36,12 +36,16 @@ public class HomeController {
     @Autowired private SupplierService supplierService;
     @Autowired private StockTransactionService transactionService;
 
-    // ── TODO ────────────────────────────────────────────────────────────────
     // GET / — populate all model attributes listed above and return "index".
     @GetMapping("/")
     public String dashboard(Model model) {
-        // TODO: add all 7 attributes to the model (see table in the header above)
-        //       return "index";
-        throw new UnsupportedOperationException("TODO — dashboard not implemented yet");
+        model.addAttribute("totalProducts", productService.getAllProducts().size());
+        model.addAttribute("totalCategories", categoryService.getAllCategories().size());
+        model.addAttribute("totalSuppliers", supplierService.getAllSuppliers().size());
+        model.addAttribute("lowStockCount", productService.getLowStockProducts().size());
+        model.addAttribute("outOfStockCount", productService.getOutOfStockProducts().size());
+        model.addAttribute("recentTx", transactionService.getRecentTransactions());
+        model.addAttribute("lowStockItems", productService.getLowStockProducts());
+        return "index";
     }
 }
