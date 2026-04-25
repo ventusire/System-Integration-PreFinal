@@ -16,6 +16,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+// ── README ACTIVITY — WHAT'S STILL NEEDED FOR THIS FILE ─────────────────────
+// Per README §"Group Assignments", this is Group 4's repository. TODO 5
+// (findTop10Recent) was finished in commit c293b42, but the remaining items
+// still need real SQL via JdbcTemplate:
+//   • TODO 6 — sumStockInByProduct(productId): SELECT COALESCE(SUM(quantity),0)
+//              FROM stock_transactions WHERE product_id = ? AND type='STOCK_IN'
+//              via queryForObject(sql, Integer.class, productId).
+//   • TODO 7 (BONUS) — countByProduct(productId): SELECT COUNT(*) FROM
+//              stock_transactions WHERE product_id = ?
+//   • TODO 8 — save(tx): INSERT into stock_transactions (product_id, type,
+//              quantity, reason, transaction_date). Use KeyHolder /
+//              GeneratedKeyHolder to capture the generated id, set it on tx,
+//              and return tx. Use CategoryRepository.save() as a reference.
+// Group 4's addStock / removeStock service methods cannot work until save()
+// is implemented here.
+// ────────────────────────────────────────────────────────────────────────────
+
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
  * │  GROUP 4 — StockTransactionRepository                           │
@@ -110,6 +127,10 @@ public class StockTransactionRepository {
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // Return only the 10 most recent transactions (dashboard preview).
     // Hint: append "ORDER BY t.transaction_date DESC LIMIT 10"
+    // RECENT FIX (commit c293b42): replaced the TODO stub with a real query
+    // ordering transactions by date DESC and limiting to 10 rows. This was the
+    // root cause of the 500 error — the dashboard called this method and got
+    // an UnsupportedOperationException.
     public List<StockTransaction> findTop10Recent() {
         return jdbcTemplate.query(BASE_SELECT + "ORDER BY t.transaction_date DESC LIMIT 10", rowMapper);
     }

@@ -17,6 +17,26 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+// ── README ACTIVITY — WHAT'S STILL NEEDED FOR THIS FILE ─────────────────────
+// Per README §"What You Need to Complete" → Repository (raw SQL), this is
+// Group 3's repository. TODOs 5 and 6 were finished in commit c293b42, but
+// the rest of the SQL still needs to be written using JdbcTemplate:
+//   • TODO 7  — searchByKeyword(keyword): LOWER(name)/LOWER(sku) LIKE ?
+//               with the same "%kw%" bound to both placeholders.
+//   • TODO 8  — countByCategory(categoryId): SELECT COUNT(*) ... WHERE
+//               category_id = ?  via queryForObject(sql, Long.class, ...).
+//   • TODO 9  — save() UPDATE branch: write the UPDATE statement covering
+//               name, sku, description, price, stock_quantity, reorder_level,
+//               category_id, supplier_id, filtered by id.
+//   • TODO 10 — updateStock(productId, newQuantity): UPDATE products SET
+//               stock_quantity = ? WHERE id = ?  (called by Group 4's
+//               StockTransactionService — they cannot finish without this).
+//   • TODO 11 — deleteById(id): DELETE FROM products WHERE id = ?
+//   • TODO 12 — count() (BONUS): SELECT COUNT(*) FROM products.
+// Until these are filled in, the product CRUD pages and Group 4's stock
+// add/remove flows will throw UnsupportedOperationException at runtime.
+// ────────────────────────────────────────────────────────────────────────────
+
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
  * │  GROUP 3 — ProductRepository                                    │
@@ -145,12 +165,18 @@ public class ProductRepository {
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity <= reorder_level (low stock alert).
+    // RECENT FIX (commit c293b42): replaced the TODO stub with a real JdbcTemplate
+    // query that appends the WHERE clause to BASE_SELECT so the dashboard can list
+    // products that have hit or fallen below their reorder threshold.
     public List<Product> findLowStockProducts() {
         return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity <= p.reorder_level ORDER BY p.stock_quantity", rowMapper);
     }
 
     // ── TODO 6 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity = 0 (completely out of stock).
+    // RECENT FIX (commit c293b42): replaced the TODO stub with a JdbcTemplate
+    // query that returns every product whose stock has hit zero, alphabetised by
+    // name — used by the dashboard's "out of stock" counter.
     public List<Product> findOutOfStock() {
         return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity = 0 ORDER BY p.name", rowMapper);
     }

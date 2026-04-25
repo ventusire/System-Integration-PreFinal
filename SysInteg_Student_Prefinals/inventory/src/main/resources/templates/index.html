@@ -79,6 +79,9 @@
                     <a th:href="@{/products}" class="btn btn-sm btn-outline-secondary">View All</a>
                 </div>
                 <div class="card-body px-4">
+                    <!-- RECENT FIX (commit c293b42): added a null guard. Before, if the controller
+                         failed or returned null, calling .isEmpty() on a null list crashed Thymeleaf.
+                         Now the table only renders when the list is non-null AND non-empty. -->
                     <table class="table table-sm table-hover mb-0" th:if="${lowStockItems != null && !lowStockItems.isEmpty()}">
                         <thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Reorder At</th></tr></thead>
                         <tbody>

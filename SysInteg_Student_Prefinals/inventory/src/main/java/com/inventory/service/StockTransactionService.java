@@ -11,6 +11,29 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// ── README ACTIVITY — WHAT'S STILL NEEDED FOR THIS FILE ─────────────────────
+// Per README §"What You Need to Complete" → Service (business logic), Group 4
+// owns the only service with REAL business logic in the project. TODO 1
+// (getRecentTransactions) was finished in commit c293b42; the rest is still
+// outstanding:
+//   • TODO 2 — getTransactionsByProduct(productId): delegate to
+//              transactionRepository.findByProduct(productId).
+//   • TODO 3 — addStock(productId, quantity, reason) [@Transactional]:
+//              1. Load product (throw RuntimeException if missing).
+//              2. newQty = current stock + quantity.
+//              3. productRepository.updateStock(productId, newQty).
+//              4. Build a StockTransaction (type=STOCK_IN, now()) and save it.
+//              5. Return the saved transaction.
+//   • TODO 4 — removeStock(productId, quantity, reason) [@Transactional]:
+//              1. Load product (throw if missing).
+//              2. If product.getStockQuantity() < quantity → throw
+//                 RuntimeException "Insufficient stock. Available: " + qty.
+//              3. newQty = current stock - quantity.
+//              4. productRepository.updateStock(...) and save a STOCK_OUT row.
+// These methods depend on ProductRepository.updateStock (TODO 10) and
+// StockTransactionRepository.save (TODO 8) being implemented first.
+// ────────────────────────────────────────────────────────────────────────────
+
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
  * │  GROUP 4 — StockTransactionService                              │
@@ -38,6 +61,9 @@ public class StockTransactionService {
 
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Return only the 10 most recent transactions (used on the dashboard).
+    // RECENT FIX (commit c293b42): this was the exact method that surfaced the
+    // 500 error in the original stack trace. Now delegates to the repository's
+    // findTop10Recent() so the dashboard's recent-transactions panel renders.
     public List<StockTransaction> getRecentTransactions() {
         return transactionRepository.findTop10Recent();
     }
