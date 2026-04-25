@@ -1,15 +1,16 @@
 package com.inventory.service;
 
-import com.inventory.model.Product;
-import com.inventory.model.StockTransaction;
-import com.inventory.repository.ProductRepository;
-import com.inventory.repository.StockTransactionRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.inventory.model.Product;
+import com.inventory.model.StockTransaction;
+import com.inventory.repository.ProductRepository;
+import com.inventory.repository.StockTransactionRepository;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -63,8 +64,17 @@ public class StockTransactionService {
      */
     @Transactional
     public StockTransaction addStock(Long productId, int quantity, String reason) {
-        // TODO: follow the steps above
-        throw new UnsupportedOperationException("TODO 3 — addStock not implemented yet");
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        int newQty = product.getStockQuantity() + quantity;
+        productRepository.updateStock(productId, newQty);
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(product);
+        tx.setType(StockTransaction.Type.STOCK_IN);
+        tx.setQuantity(quantity);
+        tx.setReason(reason);
+        tx.setTransactionDate(LocalDateTime.now());
+        return transactionRepository.save(tx);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
@@ -82,7 +92,19 @@ public class StockTransactionService {
      */
     @Transactional
     public StockTransaction removeStock(Long productId, int quantity, String reason) {
-        // TODO: follow the steps above — pay attention to the stock check in step 2
-        throw new UnsupportedOperationException("TODO 4 — removeStock not implemented yet");
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        if (product.getStockQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock. Available: " + product.getStockQuantity());
+        }
+        int newQty = product.getStockQuantity() - quantity;
+        productRepository.updateStock(productId, newQty);
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(product);
+        tx.setType(StockTransaction.Type.STOCK_OUT);
+        tx.setQuantity(quantity);
+        tx.setReason(reason);
+        tx.setTransactionDate(LocalDateTime.now());
+        return transactionRepository.save(tx);
     }
 }

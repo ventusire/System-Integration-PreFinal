@@ -1,8 +1,11 @@
 package com.inventory.repository;
 
-import com.inventory.model.Category;
-import com.inventory.model.Product;
-import com.inventory.model.Supplier;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,12 +13,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
+import com.inventory.model.Category;
+import com.inventory.model.Product;
+import com.inventory.model.Supplier;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -146,13 +146,17 @@ public class ProductRepository {
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity <= reorder_level (low stock alert).
     public List<Product> findLowStockProducts() {
-        return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity <= p.reorder_level ORDER BY p.stock_quantity", rowMapper);
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.stock_quantity <= p.reorder_level ORDER BY p.stock_quantity",
+            rowMapper);
     }
 
     // ── TODO 6 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity = 0 (completely out of stock).
     public List<Product> findOutOfStock() {
-        return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity = 0 ORDER BY p.name", rowMapper);
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.stock_quantity = 0 ORDER BY p.name",
+            rowMapper);
     }
 
     // ── TODO 7 ──────────────────────────────────────────────────────────────
@@ -179,7 +183,7 @@ public class ProductRepository {
         if (product.getId() == null) {
             // ── INSERT (provided as example) ─────────────────────────────
             String sql = "INSERT INTO products (name, sku, description, price, stock_quantity, " +
-                         "reorder_level, category_id, supplier_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        "reorder_level, category_id, supplier_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -210,8 +214,7 @@ public class ProductRepository {
     // Update ONLY the stock_quantity for a product (called by StockTransactionService).
     // Hint: UPDATE products SET stock_quantity = ? WHERE id = ?
     public void updateStock(Long productId, int newQuantity) {
-        // TODO: use jdbcTemplate.update(sql, newQuantity, productId)
-        throw new UnsupportedOperationException("TODO 10 — updateStock not implemented yet");
+        jdbcTemplate.update("UPDATE products SET stock_quantity = ? WHERE id = ?", newQuantity, productId);
     }
 
     // ── TODO 11 ─────────────────────────────────────────────────────────────
