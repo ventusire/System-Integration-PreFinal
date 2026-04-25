@@ -115,7 +115,7 @@ Each file contains one fully-worked **EXAMPLE** at the top, followed by numbered
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/your-username/inventoryms-activity.git
+https://github.com/ventusire/System-Integration-PreFinal.git
 cd inventoryms-activity/inventory
 ```
 
