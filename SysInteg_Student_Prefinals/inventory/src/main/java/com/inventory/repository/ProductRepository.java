@@ -137,30 +137,35 @@ public class ProductRepository {
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Find a product by its SKU code. Return Optional.empty() if not found.
     public Optional<Product> findBySku(String sku) {
-        // TODO: append "WHERE p.sku = ?" to BASE_SELECT
-        throw new UnsupportedOperationException("TODO 1 — findBySku not implemented yet");
+        // Append WHERE p.sku = ? to BASE_SELECT and run with rowMapper
+        List<Product> results = jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.sku = ?", rowMapper, sku);
+        // Return as Optional
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
-    // Return true if a product with the given SKU already exists.
-    // Hint: SELECT COUNT(*) FROM products WHERE sku = ?
     public boolean existsBySku(String sku) {
-        // TODO: use jdbcTemplate.queryForObject(sql, Long.class, sku)
-        throw new UnsupportedOperationException("TODO 2 — existsBySku not implemented yet");
+        // Run count query and return true if count > 0
+        Long count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM products WHERE sku = ?", Long.class, sku);
+        return count != null && count > 0;
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Find all products that belong to the given category.
     public List<Product> findByCategory(Long categoryId) {
-        // TODO: append "WHERE p.category_id = ? ORDER BY p.name"
-        throw new UnsupportedOperationException("TODO 3 — findByCategory not implemented yet");
+        // Append WHERE p.category_id = ? ORDER BY p.name and pass categoryId
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.category_id = ? ORDER BY p.name", rowMapper, categoryId);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Find all products supplied by the given supplier.
     public List<Product> findBySupplier(Long supplierId) {
-        // TODO: append "WHERE p.supplier_id = ? ORDER BY p.name"
-        throw new UnsupportedOperationException("TODO 4 — findBySupplier not implemented yet");
+        // Append WHERE p.supplier_id = ? ORDER BY p.name and pass supplierId
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.supplier_id = ? ORDER BY p.name", rowMapper, supplierId);
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
