@@ -44,9 +44,8 @@ public class TransactionController {
     // The form needs all products in the model (for the product dropdown).
     @GetMapping("/new")
     public String newForm(Model model) {
-        // TODO: model.addAttribute("products", productService.getAllProducts());
-        //       return "transactions/form";
-        throw new UnsupportedOperationException("TODO 1 — newForm not implemented yet");
+        model.addAttribute("products", productService.getAllProducts());
+        return "transactions/form";
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
@@ -60,8 +59,13 @@ public class TransactionController {
                           @RequestParam int quantity,
                           @RequestParam(required = false) String reason,
                           RedirectAttributes flash) {
-        // TODO: wrap in try/catch, call addStock, set flash, redirect
-        throw new UnsupportedOperationException("TODO 2 — stockIn not implemented yet");
+        try {
+            transactionService.addStock(productId, quantity, reason);
+            flash.addFlashAttribute("success", quantity + " units added to stock.");
+        } catch (RuntimeException e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/transactions";
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
@@ -73,7 +77,36 @@ public class TransactionController {
                            @RequestParam int quantity,
                            @RequestParam(required = false) String reason,
                            RedirectAttributes flash) {
-        // TODO: wrap in try/catch, call removeStock, set flash, redirect
-        throw new UnsupportedOperationException("TODO 3 — stockOut not implemented yet");
+        try {
+            transactionService.removeStock(productId, quantity, reason);
+            flash.addFlashAttribute("success", quantity + " units removed from stock.");
+        } catch (RuntimeException e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/transactions";
+    }
+
+    // POST /transactions → create new transaction (unified endpoint)
+    // Params: productId, quantity, type (STOCK_IN/STOCK_OUT), optional reason
+    @PostMapping
+    public String create(@RequestParam Long productId,
+                         @RequestParam int quantity,
+                         @RequestParam String type,
+                         @RequestParam(required = false) String reason,
+                         RedirectAttributes flash) {
+        try {
+            if ("STOCK_IN".equalsIgnoreCase(type)) {
+                transactionService.addStock(productId, quantity, reason);
+                flash.addFlashAttribute("success", quantity + " units added to stock.");
+            } else if ("STOCK_OUT".equalsIgnoreCase(type)) {
+                transactionService.removeStock(productId, quantity, reason);
+                flash.addFlashAttribute("success", quantity + " units removed from stock.");
+            } else {
+                flash.addFlashAttribute("error", "Invalid transaction type.");
+            }
+        } catch (RuntimeException e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/transactions";
     }
 }

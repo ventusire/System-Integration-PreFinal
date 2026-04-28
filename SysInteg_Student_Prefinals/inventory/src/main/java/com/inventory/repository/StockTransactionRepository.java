@@ -80,31 +80,37 @@ public class StockTransactionRepository {
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Find ONE transaction by its id. Return Optional.empty() if not found.
     public Optional<StockTransaction> findById(Long id) {
-        // TODO: append "WHERE t.id = ?" and wrap result in Optional
-        throw new UnsupportedOperationException("TODO 1 — findById not implemented yet");
+        String sql = BASE_SELECT + "WHERE t.id = ?";
+        List<StockTransaction> results = jdbcTemplate.query(sql, rowMapper, id);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Find all transactions for a specific product, newest first.
     public List<StockTransaction> findByProduct(Long productId) {
-        // TODO: append "WHERE t.product_id = ? ORDER BY t.transaction_date DESC"
-        throw new UnsupportedOperationException("TODO 2 — findByProduct not implemented yet");
+        String sql = BASE_SELECT + "WHERE t.product_id = ? ORDER BY t.transaction_date DESC";
+        return jdbcTemplate.query(sql, rowMapper, productId);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Find all transactions of a given type (STOCK_IN or STOCK_OUT), newest first.
     // Hint: type is an enum — pass type.name() as the SQL argument (gives "STOCK_IN" string)
     public List<StockTransaction> findByType(StockTransaction.Type type) {
-        // TODO: append "WHERE t.type = ? ORDER BY t.transaction_date DESC"
-        throw new UnsupportedOperationException("TODO 3 — findByType not implemented yet");
+        String sql = BASE_SELECT + "WHERE t.type = ? ORDER BY t.transaction_date DESC";
+        return jdbcTemplate.query(sql, rowMapper, type.name());
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Find all transactions between two dates (inclusive), newest first.
     // Hint: convert LocalDateTime → Timestamp using Timestamp.valueOf(localDateTime)
     public List<StockTransaction> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        // TODO: append "WHERE t.transaction_date BETWEEN ? AND ? ORDER BY t.transaction_date DESC"
-        throw new UnsupportedOperationException("TODO 4 — findByDateBetween not implemented yet");
+        String sql = BASE_SELECT + "WHERE t.transaction_date BETWEEN ? AND ? ORDER BY t.transaction_date DESC";
+        return jdbcTemplate.query(
+            sql,
+            rowMapper,
+            Timestamp.valueOf(startDate),
+            Timestamp.valueOf(endDate)
+        );
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
@@ -119,15 +125,18 @@ public class StockTransactionRepository {
     // Hint: SELECT COALESCE(SUM(quantity), 0) FROM stock_transactions
     //       WHERE product_id = ? AND type = 'STOCK_IN'
     public int sumStockInByProduct(Long productId) {
-        // TODO: use jdbcTemplate.queryForObject(sql, Integer.class, productId)
-        throw new UnsupportedOperationException("TODO 6 — sumStockInByProduct not implemented yet");
+        String sql = "SELECT COALESCE(SUM(quantity), 0) FROM stock_transactions " +
+                     "WHERE product_id = ? AND type = 'STOCK_IN'";
+        Integer total = jdbcTemplate.queryForObject(sql, Integer.class, productId);
+        return total != null ? total : 0;
     }
 
     // ── TODO 7 (BONUS) ──────────────────────────────────────────────────────
     // Count how many transactions exist for a specific product.
     public long countByProduct(Long productId) {
-        // TODO: SELECT COUNT(*) FROM stock_transactions WHERE product_id = ?
-        throw new UnsupportedOperationException("TODO 7 — countByProduct not implemented yet");
+        String sql = "SELECT COUNT(*) FROM stock_transactions WHERE product_id = ?";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, productId);
+        return count != null ? count : 0L;
     }
 
     // ── TODO 8 ──────────────────────────────────────────────────────────────
@@ -141,8 +150,23 @@ public class StockTransactionRepository {
     //   reason           → tx.getReason()
     //   transaction_date → Timestamp.valueOf(tx.getTransactionDate())
     public StockTransaction save(StockTransaction tx) {
-        // TODO: write INSERT SQL, use KeyHolder to get generated id,
-        //       set tx.setId(...) and return tx
-        throw new UnsupportedOperationException("TODO 8 — save not implemented yet");
+        String sql = "INSERT INTO stock_transactions (product_id, type, quantity, reason, transaction_date) " +
+                     "VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, tx.getProduct().getId());
+            ps.setString(2, tx.getType().name());
+            ps.setInt(3, tx.getQuantity());
+            ps.setString(4, tx.getReason());
+            ps.setTimestamp(5, Timestamp.valueOf(tx.getTransactionDate()));
+            return ps;
+        }, keyHolder);
+
+        if (keyHolder.getKey() != null) {
+            tx.setId(keyHolder.getKey().longValue());
+        }
+        return tx;
     }
 }
