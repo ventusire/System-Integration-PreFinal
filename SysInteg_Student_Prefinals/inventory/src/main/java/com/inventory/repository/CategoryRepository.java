@@ -61,31 +61,37 @@ public class CategoryRepository {
     // Find ONE category by its id. Return Optional.empty() if not found.
     // Hint: query() returns a List — check if it is empty before wrapping.
     public Optional<Category> findById(Long id) {
-        // TODO: write the SQL and use jdbcTemplate.query(sql, rowMapper, id)
-        throw new UnsupportedOperationException("TODO 1 — findById not implemented yet");
+        String sql = "SELECT id, name, description FROM categories WHERE id = ?";
+        List<Category> result = jdbcTemplate.query(sql, rowMapper, id);
+        // Wrap the result in Optional; empty if list is empty
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Find ONE category by its exact name. Return Optional.empty() if not found.
     public Optional<Category> findByName(String name) {
-        // TODO: write the SQL — filter WHERE name = ?
-        throw new UnsupportedOperationException("TODO 2 — findByName not implemented yet");
+        String sql = "SELECT id, name, description FROM categories WHERE name = ?";
+        List<Category> result = jdbcTemplate.query(sql, rowMapper, name);
+        // Wrap the result in Optional; empty if list is empty
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Return true if a category with the given name already exists.
     // Hint: SELECT COUNT(*) ... then check if count > 0
     public boolean existsByName(String name) {
-        // TODO: use jdbcTemplate.queryForObject(sql, Long.class, name)
-        throw new UnsupportedOperationException("TODO 3 — existsByName not implemented yet");
+        String sql = "SELECT COUNT(*) FROM categories WHERE name = ?";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, name);
+        return count > 0;
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Find all categories whose name contains the keyword (case-insensitive).
     // Hint: use LOWER(name) LIKE LOWER(?) and wrap keyword with %...%
     public List<Category> searchByKeyword(String keyword) {
-        // TODO: build the LIKE query and pass "%" + keyword + "%" as the argument
-        throw new UnsupportedOperationException("TODO 4 — searchByKeyword not implemented yet");
+        String sql = "SELECT id, name, description FROM categories WHERE LOWER(name) LIKE LOWER(?)";
+        // Wrap keyword with wildcards for partial matching
+        return jdbcTemplate.query(sql, rowMapper, "%" + keyword + "%");
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
@@ -107,7 +113,8 @@ public class CategoryRepository {
             // ── TODO: UPDATE ─────────────────────────────────────────────
             // Write the UPDATE SQL and call jdbcTemplate.update(sql, ...)
             // Columns to update: name, description — filter by id
-            throw new UnsupportedOperationException("TODO 5 — UPDATE in save() not implemented yet");
+            String sql = "UPDATE categories SET name = ?, description = ? WHERE id = ?";
+            jdbcTemplate.update(sql, category.getName(), category.getDescription(), category.getId());
         }
         return category;
     }
@@ -116,15 +123,16 @@ public class CategoryRepository {
     // Delete a category by its id.
     // Hint: DELETE FROM categories WHERE id = ?
     public void deleteById(Long id) {
-        // TODO: use jdbcTemplate.update(sql, id)
-        throw new UnsupportedOperationException("TODO 6 — deleteById not implemented yet");
+        String sql = "DELETE FROM categories WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
     // ── TODO 7 (BONUS) ──────────────────────────────────────────────────────
     // Return the total count of all categories.
     // Hint: SELECT COUNT(*) FROM categories
     public long count() {
-        // TODO: use jdbcTemplate.queryForObject(sql, Long.class)
-        throw new UnsupportedOperationException("TODO 7 — count not implemented yet");
+        String sql = "SELECT COUNT(*) FROM categories";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class);
+        return count != null ? count : 0L;
     }
 }
