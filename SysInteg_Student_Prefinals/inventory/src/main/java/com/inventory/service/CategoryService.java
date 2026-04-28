@@ -1,12 +1,13 @@
 package com.inventory.service;
 
-import com.inventory.model.Category;
-import com.inventory.repository.CategoryRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.inventory.model.Category;
+import com.inventory.repository.CategoryRepository;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -33,28 +34,28 @@ public class CategoryService {
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Return a single category wrapped in Optional (it may not exist).
     public Optional<Category> getCategoryById(Long id) {
-        // TODO: return categoryRepository.findById(id)
-        throw new UnsupportedOperationException("TODO 1 — getCategoryById not implemented yet");
+        // Return the category wrapped in Optional; empty if not found.
+        return categoryRepository.findById(id);
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Save (insert or update) a category and return the saved object.
     public Category saveCategory(Category category) {
-        // TODO: return categoryRepository.save(category)
-        throw new UnsupportedOperationException("TODO 2 — saveCategory not implemented yet");
+        // Return the saved category with generated ID if inserted.
+        return categoryRepository.save(category);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Delete a category by id.
     public void deleteCategory(Long id) {
-        // TODO: call categoryRepository.deleteById(id)
-        throw new UnsupportedOperationException("TODO 3 — deleteCategory not implemented yet");
+        // Delete the category by ID.
+        categoryRepository.deleteById(id);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Return true if the given category name is already taken.
     public boolean isNameTaken(String name) {
-        // TODO: return categoryRepository.existsByName(name)
-        throw new UnsupportedOperationException("TODO 4 — isNameTaken not implemented yet");
+        // Return true if name exists in database.
+        return categoryRepository.existsByName(name);
     }
 }

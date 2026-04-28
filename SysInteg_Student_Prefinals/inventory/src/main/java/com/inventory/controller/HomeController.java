@@ -38,10 +38,43 @@ public class HomeController {
 
     // ── TODO ────────────────────────────────────────────────────────────────
     // GET / — populate all model attributes listed above and return "index".
+    // ── README ACTIVITY — WHAT'S STILL NEEDED FOR THIS FILE ─────────────────
+    // Per README §"Group Assignments", HomeController is the shared dashboard
+    // and is treated as a BONUS that all groups contribute to once their own
+    // service layers compile. The dashboard method itself is done, but it
+    // depends on every group's service being implemented:
+    //   • Group 1 (Categories)         → categoryService.getAllCategories()
+    //   • Group 2 (Suppliers)          → supplierService.getAllSuppliers()
+    //   • Group 3 (Products)           → productService.getAllProducts(),
+    //                                    getLowStockProducts(),
+    //                                    getOutOfStockProducts()
+    //   • Group 4 (Stock Transactions) → transactionService.getRecentTransactions()
+    // If any of those still throws UnsupportedOperationException, the dashboard
+    // will 500 again. No further code changes are required in this controller.
+    // ────────────────────────────────────────────────────────────────────────
+
+    // RECENT FIX (commit c293b42 — "fix dashboard issue"):
+    // This method previously threw UnsupportedOperationException, which caused a
+    // 500 error on the home page. It now wires up the dashboard view by pushing
+    // all 7 attributes that index.html expects: total counts (products, categories,
+    // suppliers), stock summary counts (low stock, out of stock), and the two
+    // list previews (recent transactions, low stock items).
     @GetMapping("/")
     public String dashboard(Model model) {
-        // TODO: add all 7 attributes to the model (see table in the header above)
-        //       return "index";
-        throw new UnsupportedOperationException("TODO — dashboard not implemented yet");
+
+        // total counts
+        model.addAttribute("totalProducts", productService.getAllProducts().size());
+        model.addAttribute("totalCategories", categoryService.getAllCategories().size());
+        model.addAttribute("totalSuppliers", supplierService.getAllSuppliers().size());
+
+        // stock info
+        model.addAttribute("lowStockCount", productService.getLowStockProducts().size());
+        model.addAttribute("outOfStockCount", productService.getOutOfStockProducts().size());
+
+        // lists
+        model.addAttribute("recentTx", transactionService.getRecentTransactions());
+        model.addAttribute("lowStockItems", productService.getLowStockProducts());
+
+        return "index"; // this loads index.html
     }
 }
