@@ -41,27 +41,23 @@ public class ProductService {
 
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     public Optional<Product> getProductById(Long id) {
-        // TODO: return productRepository.findById(id)
-        throw new UnsupportedOperationException("TODO 1 — getProductById not implemented yet");
+        return productRepository.findById(id);
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     public Product saveProduct(Product product) {
-        // TODO: return productRepository.save(product)
-        throw new UnsupportedOperationException("TODO 2 — saveProduct not implemented yet");
+        return productRepository.save(product);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     public void deleteProduct(Long id) {
-        // TODO: call productRepository.deleteById(id)
-        throw new UnsupportedOperationException("TODO 3 — deleteProduct not implemented yet");
+        productRepository.deleteById(id);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Search products by keyword (name or SKU).
     public List<Product> searchProducts(String keyword) {
-        // TODO: return productRepository.searchByKeyword(keyword)
-        throw new UnsupportedOperationException("TODO 4 — searchProducts not implemented yet");
+        return productRepository.searchByKeyword(keyword);
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
@@ -84,14 +80,12 @@ public class ProductService {
     // ── TODO 7 ──────────────────────────────────────────────────────────────
     // Return true if the given SKU is already used by another product.
     public boolean isSkuTaken(String sku) {
-        // TODO: return productRepository.existsBySku(sku)
-        throw new UnsupportedOperationException("TODO 7 — isSkuTaken not implemented yet");
+        return productRepository.existsBySku(sku);
     }
 
     // ── TODO 8 (BONUS) ──────────────────────────────────────────────────────
     // Return the total number of products in the system.
     public long countAll() {
-        // TODO: return productRepository.count()
-        throw new UnsupportedOperationException("TODO 8 — countAll not implemented yet");
+        return productRepository.count();
     }
 }
