@@ -7,8 +7,7 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.inventory.InventoryApplication",
             "projectName": "inventory",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "args": ""
         }
     ]
 }
