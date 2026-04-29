@@ -53,9 +53,8 @@ public class ProductController {
     // GET /products/{id} — load product, add to model, return "products/detail".
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        // TODO: productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
-        //       return "products/detail";
-        throw new UnsupportedOperationException("TODO 1 — detail not implemented yet");
+        productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
+        return "products/detail";
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
@@ -63,9 +62,10 @@ public class ProductController {
     // Remember: also add "categories" and "suppliers" lists to the model!
     @GetMapping("/new")
     public String newForm(Model model) {
-        // TODO: add product, categories, suppliers to model
-        //       return "products/form"
-        throw new UnsupportedOperationException("TODO 2 — newForm not implemented yet");
+        model.addAttribute("product", new Product());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        return "products/form";
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
@@ -75,10 +75,18 @@ public class ProductController {
     //       so the dropdowns pre-select the right option.
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
-        // TODO: load product, set categoryId/supplierId, add to model
-        //       also add categories and suppliers lists
-        //       return "products/form"
-        throw new UnsupportedOperationException("TODO 3 — editForm not implemented yet");
+        productService.getProductById(id).ifPresent(p -> {
+            model.addAttribute("product", p);
+            if (p.getCategory() != null) {
+                model.addAttribute("categoryId", p.getCategory().getId());
+            }
+            if (p.getSupplier() != null) {
+                model.addAttribute("supplierId", p.getSupplier().getId());
+            }
+        });
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        return "products/form";
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
@@ -87,15 +95,22 @@ public class ProductController {
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute Product product, BindingResult result,
                        Model model, RedirectAttributes flash) {
-        // TODO: handle errors (re-add lists!), save, flash, redirect
-        throw new UnsupportedOperationException("TODO 4 — save not implemented yet");
+        if (result.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("suppliers", supplierService.getAllSuppliers());
+            return "products/form";
+        }
+        productService.saveProduct(product);
+        flash.addFlashAttribute("message", "Product saved successfully!");
+        return "redirect:/products";
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // POST /products/delete/{id} — delete, flash message, redirect.
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
-        // TODO: delete → flash → redirect
-        throw new UnsupportedOperationException("TODO 5 — delete not implemented yet");
+        productService.deleteProduct(id);
+        flash.addFlashAttribute("message", "Product deleted successfully!");
+        return "redirect:/products";
     }
 }
