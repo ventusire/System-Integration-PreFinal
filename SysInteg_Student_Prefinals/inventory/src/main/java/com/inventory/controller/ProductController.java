@@ -100,6 +100,18 @@ public class ProductController {
             model.addAttribute("suppliers", supplierService.getAllSuppliers());
             return "products/form";
         }
+        
+        // Check for duplicate SKU (only for new products or if SKU changed)
+        if (product.getId() == null || product.getId() == 0) {
+            // New product - check if SKU already exists
+            if (productService.isSkuTaken(product.getSku())) {
+                result.rejectValue("sku", "error.sku.duplicate", "SKU already exists!");
+                model.addAttribute("categories", categoryService.getAllCategories());
+                model.addAttribute("suppliers", supplierService.getAllSuppliers());
+                return "products/form";
+            }
+        }
+        
         productService.saveProduct(product);
         flash.addFlashAttribute("message", "Product saved successfully!");
         return "redirect:/products";
