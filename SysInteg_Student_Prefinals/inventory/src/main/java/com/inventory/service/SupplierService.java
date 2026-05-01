@@ -26,27 +26,31 @@ public class SupplierService {
     }
 
     // ── TODO 1 ──────────────────────────────────────────────────────────────
+    // Retrieve a single supplier by ID. Returns Optional to safely handle cases
+    // where the supplier does not exist, avoiding null pointer exceptions.
     public Optional<Supplier> getSupplierById(Long id) {
-        // TODO: return supplierRepository.findById(id)
-        throw new UnsupportedOperationException("TODO 1 — getSupplierById not implemented yet");
+        return supplierRepository.findById(id);
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
+    // Persist supplier data to the database. Automatically handles both INSERT
+    // (new supplier, no ID) and UPDATE (existing supplier with ID) operations.
     public Supplier saveSupplier(Supplier supplier) {
-        // TODO: return supplierRepository.save(supplier)
-        throw new UnsupportedOperationException("TODO 2 — saveSupplier not implemented yet");
+        return supplierRepository.save(supplier);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
+    // Remove a supplier record from the database by its unique ID.
+    // This operation is delegated to the repository layer for safe SQL execution.
     public void deleteSupplier(Long id) {
-        // TODO: call supplierRepository.deleteById(id)
-        throw new UnsupportedOperationException("TODO 3 — deleteSupplier not implemented yet");
+        supplierRepository.deleteById(id);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
-    // Return true if the given email is already registered to another supplier.
+    // Validate email uniqueness by checking if it already exists in the database.
+    // Returns true if the email is taken, false if available. Used during
+    // supplier creation/edit to enforce email constraints and prevent duplicates.
     public boolean isEmailTaken(String email) {
-        // TODO: return supplierRepository.existsByEmail(email)
-        throw new UnsupportedOperationException("TODO 4 — isEmailTaken not implemented yet");
+        return supplierRepository.existsByEmail(email);
     }
 }

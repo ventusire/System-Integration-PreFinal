@@ -44,9 +44,11 @@ public class TransactionController {
     // The form needs all products in the model (for the product dropdown).
     @GetMapping("/new")
     public String newForm(Model model) {
-        // TODO: model.addAttribute("products", productService.getAllProducts());
-        //       return "transactions/form";
-        throw new UnsupportedOperationException("TODO 1 — newForm not implemented yet");
+        // COMPLETED: Delegate to ProductService to fetch all products from database
+        // and attach them to the Model so the form template can populate the dropdown.
+        // The form will iterate over this list to allow users to select a product.
+        model.addAttribute("products", productService.getAllProducts());
+        return "transactions/form";
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
@@ -60,8 +62,22 @@ public class TransactionController {
                           @RequestParam int quantity,
                           @RequestParam(required = false) String reason,
                           RedirectAttributes flash) {
-        // TODO: wrap in try/catch, call addStock, set flash, redirect
-        throw new UnsupportedOperationException("TODO 2 — stockIn not implemented yet");
+        try {
+            // COMPLETED: Attempt to add stock via service. The service handles the business
+            // logic: creates a stock transaction record and updates product quantity.
+            // If product not found or other error occurs, the service throws RuntimeException.
+            transactionService.addStock(productId, quantity, reason);
+            // SUCCESS: Flash a user-friendly message showing the quantity added.
+            // This message will display on the next page via Spring's flash mechanism.
+            flash.addFlashAttribute("message", quantity + " units added to stock.");
+        } catch (RuntimeException e) {
+            // ERROR HANDLING: Catch any exception from the service (e.g., product not found)
+            // and flash the error message so the user sees what went wrong without crashing.
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        // REDIRECT: Always return to the transactions list, whether success or failure.
+        // Flash attributes persist across the redirect so messages appear on the next page.
+        return "redirect:/transactions";
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
@@ -73,7 +89,24 @@ public class TransactionController {
                            @RequestParam int quantity,
                            @RequestParam(required = false) String reason,
                            RedirectAttributes flash) {
-        // TODO: wrap in try/catch, call removeStock, set flash, redirect
-        throw new UnsupportedOperationException("TODO 3 — stockOut not implemented yet");
+        try {
+            // COMPLETED: Attempt to remove stock via service. The service validates that
+            // the product has sufficient stock before creating a stock-out transaction.
+            // If stock is insufficient, the service throws a RuntimeException with a
+            // descriptive message (e.g., "Insufficient stock to remove X units").
+            transactionService.removeStock(productId, quantity, reason);
+            // SUCCESS: Flash a user-friendly message showing the quantity removed.
+            // This confirms the operation completed without issues.
+            flash.addFlashAttribute("message", quantity + " units removed from stock.");
+        } catch (RuntimeException e) {
+            // ERROR HANDLING: Catch exceptions from the service. Common cases include:
+            // - Insufficient stock (most common for stock-out)
+            // - Product not found
+            // Flash the error message so the user understands what went wrong.
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        // REDIRECT: Always return to the transactions list for consistency.
+        // The flash attributes carry error/success messages across the redirect.
+        return "redirect:/transactions";
     }
 }
