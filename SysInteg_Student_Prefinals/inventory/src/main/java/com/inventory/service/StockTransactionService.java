@@ -46,8 +46,8 @@ public class StockTransactionService {
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Return all transactions for a specific product.
     public List<StockTransaction> getTransactionsByProduct(Long productId) {
-        // TODO: return transactionRepository.findByProduct(productId)
-        throw new UnsupportedOperationException("TODO 2 — getTransactionsByProduct not implemented yet");
+        validateProductId(productId);
+        return transactionRepository.findByProduct(productId);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
@@ -64,16 +64,24 @@ public class StockTransactionService {
      */
     @Transactional
     public StockTransaction addStock(Long productId, int quantity, String reason) {
+        validateProductId(productId);
+        validateQuantity(quantity);
+
         Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
-        int newQty = product.getStockQuantity() + quantity;
+            .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+
+        int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+        int newQty = currentStock + quantity;
         productRepository.updateStock(productId, newQty);
+        product.setStockQuantity(newQty);
+
         StockTransaction tx = new StockTransaction();
         tx.setProduct(product);
         tx.setType(StockTransaction.Type.STOCK_IN);
         tx.setQuantity(quantity);
-        tx.setReason(reason);
+        tx.setReason(normalizeReason(reason)); // optional
         tx.setTransactionDate(LocalDateTime.now());
+
         return transactionRepository.save(tx);
     }
 
@@ -92,19 +100,48 @@ public class StockTransactionService {
      */
     @Transactional
     public StockTransaction removeStock(Long productId, int quantity, String reason) {
+        validateProductId(productId);
+        validateQuantity(quantity);
+
         Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
-        if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Insufficient stock. Available: " + product.getStockQuantity());
+            .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+
+        int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+        if (currentStock < quantity) {
+            throw new RuntimeException("Insufficient stock. Available: " + currentStock);
         }
-        int newQty = product.getStockQuantity() - quantity;
+
+        int newQty = currentStock - quantity;
         productRepository.updateStock(productId, newQty);
+        product.setStockQuantity(newQty);
+
         StockTransaction tx = new StockTransaction();
         tx.setProduct(product);
         tx.setType(StockTransaction.Type.STOCK_OUT);
         tx.setQuantity(quantity);
-        tx.setReason(reason);
+        tx.setReason(normalizeReason(reason)); // optional
         tx.setTransactionDate(LocalDateTime.now());
+
         return transactionRepository.save(tx);
+    }
+
+    private void validateProductId(Long productId) {
+        if (productId == null || productId <= 0) {
+            throw new IllegalArgumentException("Product ID must be a positive number");
+        }
+    }
+
+    private void validateQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+    }
+
+    private String normalizeReason(String reason) {
+        if (reason == null) {
+            return null;
+        }
+        String trimmed = reason.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

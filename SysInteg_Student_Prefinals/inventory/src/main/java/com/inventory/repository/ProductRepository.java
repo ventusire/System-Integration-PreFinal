@@ -214,7 +214,8 @@ public class ProductRepository {
     // Update ONLY the stock_quantity for a product (called by StockTransactionService).
     // Hint: UPDATE products SET stock_quantity = ? WHERE id = ?
     public void updateStock(Long productId, int newQuantity) {
-        jdbcTemplate.update("UPDATE products SET stock_quantity = ? WHERE id = ?", newQuantity, productId);
+        // TODO: use jdbcTemplate.update(sql, newQuantity, productId)
+        throw new UnsupportedOperationException("TODO 10 — updateStock not implemented yet");
     }
 
     // ── TODO 11 ─────────────────────────────────────────────────────────────
