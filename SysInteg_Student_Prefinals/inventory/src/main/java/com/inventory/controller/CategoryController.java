@@ -43,50 +43,49 @@ public class CategoryController {
         return "categories/list";
     }
 
-    // ── TODO 1 ──────────────────────────────────────────────────────────────
+    // ── New form ────────────────────────────────────────────────────────────
     // GET /categories/new
     // Add a blank Category object to the model (the form needs it for binding),
     // then return the template name "categories/form".
     @GetMapping("/new")
     public String newForm(Model model) {
-        // TODO: model.addAttribute("category", new Category());
-        //       return "categories/form";
-        throw new UnsupportedOperationException("TODO 1 — newForm not implemented yet");
+        model.addAttribute("category", new Category());
+        return "categories/form";
     }
+    
 
-    // ── TODO 2 ──────────────────────────────────────────────────────────────
+    // ── Edit form ───────────────────────────────────────────────────────────
     // GET /categories/edit/{id}
     // Load the category from the service and put it in the model,
     // then return "categories/form".
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
-        // TODO: categoryService.getCategoryById(id).ifPresent(c -> model.addAttribute("category", c));
-        //       return "categories/form";
-        throw new UnsupportedOperationException("TODO 2 — editForm not implemented yet");
+        categoryService.getCategoryById(id).ifPresent(c -> model.addAttribute("category", c));
+        return "categories/form";
     }
 
-    // ── TODO 3 ──────────────────────────────────────────────────────────────
+    // ── Save ────────────────────────────────────────────────────────────────
     // POST /categories/save
     // If validation errors exist → return the form again.
     // Otherwise save and redirect to /categories with a success message.
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute Category category, BindingResult result,
                        RedirectAttributes flash) {
-        // TODO: check result.hasErrors() → return "categories/form"
-        //       categoryService.saveCategory(category)
-        //       flash.addFlashAttribute("success", "Category saved!")
-        //       return "redirect:/categories"
-        throw new UnsupportedOperationException("TODO 3 — save not implemented yet");
+        if (result.hasErrors()) {
+            return "categories/form";
+        }
+        categoryService.saveCategory(category);
+        flash.addFlashAttribute("success", "Category saved!");
+        return "redirect:/categories";
     }
 
-    // ── TODO 4 ──────────────────────────────────────────────────────────────
+    // ── Delete ──────────────────────────────────────────────────────────────
     // POST /categories/delete/{id}
     // Delete the category and redirect back to /categories with a message.
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
-        // TODO: categoryService.deleteCategory(id)
-        //       flash.addFlashAttribute("success", "Category deleted.")
-        //       return "redirect:/categories"
-        throw new UnsupportedOperationException("TODO 4 — delete not implemented yet");
+        categoryService.deleteCategory(id);
+        flash.addFlashAttribute("success", "Category deleted.");
+        return "redirect:/categories";
     }
 }
