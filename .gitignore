@@ -1,0 +1,50 @@
+## OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+## Editor / IDE settings
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Secrets / environment files
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+
+## Logs
+*.log
+logs/
+
+## Build / dependency artifacts
+node_modules/
+dist/
+build/
+out/
+coverage/
+target/
+*.tmp
+*.temp
+
+## Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+## Misc backups
+*.bak
+*.swp
+*.cache

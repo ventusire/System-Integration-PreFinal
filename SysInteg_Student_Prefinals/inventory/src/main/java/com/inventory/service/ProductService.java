@@ -1,12 +1,13 @@
 package com.inventory.service;
 
-import com.inventory.model.Product;
-import com.inventory.repository.ProductRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.inventory.model.Product;
+import com.inventory.repository.ProductRepository;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -32,11 +33,9 @@ public class ProductService {
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
-    public Product saveProduct(Product product) {
-        // TODO: return productRepository.save(product)
-        throw new UnsupportedOperationException("TODO 2 — saveProduct not implemented yet");
-    }
-
+public Product saveProduct(Product product) {
+    return productRepository.save(product);
+}
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     public void deleteProduct(Long id) {
         // TODO: call productRepository.deleteById(id)

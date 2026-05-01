@@ -1,16 +1,23 @@
 package com.inventory.controller;
 
-import com.inventory.model.Product;
-import com.inventory.service.CategoryService;
-import com.inventory.service.ProductService;
-import com.inventory.service.SupplierService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.inventory.model.Product;
+import com.inventory.service.CategoryService;
+import com.inventory.service.ProductService;
+import com.inventory.service.SupplierService;
+
+import jakarta.validation.Valid;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
@@ -61,12 +68,13 @@ public class ProductController {
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // GET /products/new — blank product form.
     // Remember: also add "categories" and "suppliers" lists to the model!
-    @GetMapping("/new")
-    public String newForm(Model model) {
-        // TODO: add product, categories, suppliers to model
-        //       return "products/form"
-        throw new UnsupportedOperationException("TODO 2 — newForm not implemented yet");
-    }
+@GetMapping("/new")
+public String newForm(Model model) {
+    model.addAttribute("product", new Product());
+    model.addAttribute("categories", categoryService.getAllCategories());
+    model.addAttribute("suppliers", supplierService.getAllSuppliers());
+    return "products/form";
+}
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     // GET /products/edit/{id} — pre-filled edit form.
@@ -84,12 +92,17 @@ public class ProductController {
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // POST /products/save — validate, save, redirect.
     // On error: re-add categories and suppliers to model and return the form.
-    @PostMapping("/save")
-    public String save(@Valid @ModelAttribute Product product, BindingResult result,
-                       Model model, RedirectAttributes flash) {
-        // TODO: handle errors (re-add lists!), save, flash, redirect
-        throw new UnsupportedOperationException("TODO 4 — save not implemented yet");
+@PostMapping("/save")
+public String save(@Valid @ModelAttribute Product product, BindingResult result, Model model, RedirectAttributes flash) {
+    if (result.hasErrors()) {
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        return "products/form";
     }
+    productService.saveProduct(product);
+    flash.addFlashAttribute("success", "Product saved successfully!");
+    return "redirect:/products";
+}
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
     // POST /products/delete/{id} — delete, flash message, redirect.
