@@ -43,7 +43,7 @@ public class CategoryController {
         return "categories/list";
     }
 
-    // ── TODO 1 ──────────────────────────────────────────────────────────────
+    // ── New form ────────────────────────────────────────────────────────────
     // GET /categories/new
     // Add a blank Category object to the model (the form needs it for binding),
     // then return the template name "categories/form".
@@ -52,8 +52,9 @@ public class CategoryController {
         model.addAttribute("category", new Category());
         return "categories/form";
     }
+    
 
-    // ── TODO 2 ──────────────────────────────────────────────────────────────
+    // ── Edit form ───────────────────────────────────────────────────────────
     // GET /categories/edit/{id}
     // Load the category from the service and put it in the model,
     // then return "categories/form".
@@ -63,7 +64,7 @@ public class CategoryController {
         return "categories/form";
     }
 
-    // ── TODO 3 ──────────────────────────────────────────────────────────────
+    // ── Save ────────────────────────────────────────────────────────────────
     // POST /categories/save
     // If validation errors exist → return the form again.
     // Otherwise save and redirect to /categories with a success message.
@@ -78,7 +79,7 @@ public class CategoryController {
         return "redirect:/categories";
     }
 
-    // ── TODO 4 ──────────────────────────────────────────────────────────────
+    // ── Delete ──────────────────────────────────────────────────────────────
     // POST /categories/delete/{id}
     // Delete the category and redirect back to /categories with a message.
     @PostMapping("/delete/{id}")

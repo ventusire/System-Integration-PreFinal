@@ -30,6 +30,7 @@ dist/
 build/
 out/
 coverage/
+target/
 *.tmp
 *.temp
 
