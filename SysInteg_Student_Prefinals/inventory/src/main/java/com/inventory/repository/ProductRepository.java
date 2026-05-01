@@ -20,7 +20,7 @@ import com.inventory.model.Supplier;
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
  * │  GROUP 3 — ProductRepository                                    │
- * │  Complete every TODO below using JdbcTemplate.                  │
+ * │  Repository class for managing Product entities in the database.│
  * │                                                                 │
  * │  TABLE: products                                                │
  * │    id              BIGINT  (PK)                                 │
@@ -100,13 +100,11 @@ public class ProductRepository {
         "LEFT JOIN categories c ON p.category_id = c.id " +
         "LEFT JOIN suppliers  s ON p.supplier_id  = s.id ";
 
-    // ── EXAMPLE 1 ───────────────────────────────────────────────────────────
     // Returns all products ordered by name.
     public List<Product> findAll() {
         return jdbcTemplate.query(BASE_SELECT + "ORDER BY p.name", rowMapper);
     }
 
-    // ── EXAMPLE 2 ───────────────────────────────────────────────────────────
     // Finds one product by id. Returns Optional.empty() if not found.
     public Optional<Product> findById(Long id) {
         List<Product> results = jdbcTemplate.query(
@@ -114,36 +112,32 @@ public class ProductRepository {
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
-    // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Find a product by its SKU code. Return Optional.empty() if not found.
     public Optional<Product> findBySku(String sku) {
-        // TODO: append "WHERE p.sku = ?" to BASE_SELECT
-        throw new UnsupportedOperationException("TODO 1 — findBySku not implemented yet");
+        List<Product> results = jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.sku = ?", rowMapper, sku);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
-    // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Return true if a product with the given SKU already exists.
-    // Hint: SELECT COUNT(*) FROM products WHERE sku = ?
     public boolean existsBySku(String sku) {
-        // TODO: use jdbcTemplate.queryForObject(sql, Long.class, sku)
-        throw new UnsupportedOperationException("TODO 2 — existsBySku not implemented yet");
+        String sql = "SELECT COUNT(*) FROM products WHERE sku = ?";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, sku);
+        return count != null && count > 0;
     }
 
-    // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Find all products that belong to the given category.
     public List<Product> findByCategory(Long categoryId) {
-        // TODO: append "WHERE p.category_id = ? ORDER BY p.name"
-        throw new UnsupportedOperationException("TODO 3 — findByCategory not implemented yet");
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.category_id = ? ORDER BY p.name", rowMapper, categoryId);
     }
 
-    // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Find all products supplied by the given supplier.
     public List<Product> findBySupplier(Long supplierId) {
-        // TODO: append "WHERE p.supplier_id = ? ORDER BY p.name"
-        throw new UnsupportedOperationException("TODO 4 — findBySupplier not implemented yet");
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE p.supplier_id = ? ORDER BY p.name", rowMapper, supplierId);
     }
 
-    // ── TODO 5 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity <= reorder_level (low stock alert).
     public List<Product> findLowStockProducts() {
         return jdbcTemplate.query(
@@ -151,7 +145,6 @@ public class ProductRepository {
             rowMapper);
     }
 
-    // ── TODO 6 ──────────────────────────────────────────────────────────────
     // Find all products where stock_quantity = 0 (completely out of stock).
     public List<Product> findOutOfStock() {
         return jdbcTemplate.query(
@@ -159,29 +152,24 @@ public class ProductRepository {
             rowMapper);
     }
 
-    // ── TODO 7 ──────────────────────────────────────────────────────────────
     // Search products by keyword — match against name OR sku (case-insensitive).
-    // Hint: LOWER(p.name) LIKE ? OR LOWER(p.sku) LIKE ?
-    //       Pass the same "%" + keyword.toLowerCase() + "%" for both ? markers.
     public List<Product> searchByKeyword(String keyword) {
-        // TODO: build the LIKE query and pass two arguments
-        throw new UnsupportedOperationException("TODO 7 — searchByKeyword not implemented yet");
+        String term = "%" + keyword.toLowerCase() + "%";
+        return jdbcTemplate.query(
+            BASE_SELECT + "WHERE LOWER(p.name) LIKE ? OR LOWER(p.sku) LIKE ? ORDER BY p.name", 
+            rowMapper, term, term);
     }
 
-    // ── TODO 8 ──────────────────────────────────────────────────────────────
     // Count how many products belong to the given category.
-    // Hint: SELECT COUNT(*) FROM products WHERE category_id = ?
     public long countByCategory(Long categoryId) {
-        // TODO: use jdbcTemplate.queryForObject(sql, Long.class, categoryId)
-        throw new UnsupportedOperationException("TODO 8 — countByCategory not implemented yet");
+        String sql = "SELECT COUNT(*) FROM products WHERE category_id = ?";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, categoryId);
+        return count != null ? count : 0L;
     }
 
-    // ── TODO 9 ──────────────────────────────────────────────────────────────
     // INSERT a new product OR UPDATE an existing one.
-    // The INSERT block is provided as an example — complete the UPDATE block.
     public Product save(Product product) {
         if (product.getId() == null) {
-            // ── INSERT (provided as example) ─────────────────────────────
             String sql = "INSERT INTO products (name, sku, description, price, stock_quantity, " +
                         "reorder_level, category_id, supplier_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -201,34 +189,38 @@ public class ProductRepository {
             }, keyHolder);
             product.setId(keyHolder.getKey().longValue());
         } else {
-            // ── TODO: UPDATE ─────────────────────────────────────────────
-            // Columns: name, sku, description, price, stock_quantity,
-            //          reorder_level, category_id, supplier_id
-            // Filter:  WHERE id = ?
-            throw new UnsupportedOperationException("TODO 9 — UPDATE in save() not implemented yet");
+            String sql = "UPDATE products SET name = ?, sku = ?, description = ?, price = ?, stock_quantity = ?, " +
+                         "reorder_level = ?, category_id = ?, supplier_id = ? WHERE id = ?";
+            jdbcTemplate.update(sql, 
+                product.getName(), 
+                product.getSku(), 
+                product.getDescription(), 
+                product.getPrice(),
+                product.getStockQuantity() != null ? product.getStockQuantity() : 0,
+                product.getReorderLevel() != null ? product.getReorderLevel() : 10,
+                product.getCategoryId() != null ? product.getCategoryId() : null,
+                product.getSupplierId() != null ? product.getSupplierId() : null,
+                product.getId());
         }
         return product;
     }
 
-    // ── TODO 10 ─────────────────────────────────────────────────────────────
     // Update ONLY the stock_quantity for a product (called by StockTransactionService).
-    // Hint: UPDATE products SET stock_quantity = ? WHERE id = ?
     public void updateStock(Long productId, int newQuantity) {
-        // TODO: use jdbcTemplate.update(sql, newQuantity, productId)
-        throw new UnsupportedOperationException("TODO 10 — updateStock not implemented yet");
+        String sql = "UPDATE products SET stock_quantity = ? WHERE id = ?";
+        jdbcTemplate.update(sql, newQuantity, productId);
     }
 
-    // ── TODO 11 ─────────────────────────────────────────────────────────────
     // Delete a product by its id.
     public void deleteById(Long id) {
-        // TODO: DELETE FROM products WHERE id = ?
-        throw new UnsupportedOperationException("TODO 11 — deleteById not implemented yet");
+        String sql = "DELETE FROM products WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
-    // ── TODO 12 (BONUS) ─────────────────────────────────────────────────────
     // Return the total count of all products.
     public long count() {
-        // TODO: SELECT COUNT(*) FROM products
-        throw new UnsupportedOperationException("TODO 12 — count not implemented yet");
+        String sql = "SELECT COUNT(*) FROM products";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class);
+        return count != null ? count : 0L;
     }
 }

@@ -28,8 +28,7 @@ public class ProductService {
 
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     public Optional<Product> getProductById(Long id) {
-        // TODO: return productRepository.findById(id)
-        throw new UnsupportedOperationException("TODO 1 — getProductById not implemented yet");
+        return productRepository.findById(id);
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
@@ -38,8 +37,7 @@ public Product saveProduct(Product product) {
 }
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     public void deleteProduct(Long id) {
-        // TODO: call productRepository.deleteById(id)
-        throw new UnsupportedOperationException("TODO 3 — deleteProduct not implemented yet");
+        productRepository.deleteById(id);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────

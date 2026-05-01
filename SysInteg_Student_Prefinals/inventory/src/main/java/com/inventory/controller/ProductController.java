@@ -60,9 +60,8 @@ public class ProductController {
     // GET /products/{id} — load product, add to model, return "products/detail".
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        // TODO: productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
-        //       return "products/detail";
-        throw new UnsupportedOperationException("TODO 1 — detail not implemented yet");
+        productService.getProductById(id).ifPresent(p -> model.addAttribute("product", p));
+        return "products/detail";
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
@@ -83,10 +82,14 @@ public String newForm(Model model) {
     //       so the dropdowns pre-select the right option.
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
-        // TODO: load product, set categoryId/supplierId, add to model
-        //       also add categories and suppliers lists
-        //       return "products/form"
-        throw new UnsupportedOperationException("TODO 3 — editForm not implemented yet");
+        Product p = productService.getProductById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+        if (p.getCategory() != null) p.setCategoryId(p.getCategory().getId());
+        if (p.getSupplier() != null) p.setSupplierId(p.getSupplier().getId());
+        model.addAttribute("product", p);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        return "products/form";
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
@@ -108,7 +111,8 @@ public String save(@Valid @ModelAttribute Product product, BindingResult result,
     // POST /products/delete/{id} — delete, flash message, redirect.
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
-        // TODO: delete → flash → redirect
-        throw new UnsupportedOperationException("TODO 5 — delete not implemented yet");
+        productService.deleteProduct(id);
+        flash.addFlashAttribute("success", "Product deleted successfully!");
+        return "redirect:/products";
     }
 }

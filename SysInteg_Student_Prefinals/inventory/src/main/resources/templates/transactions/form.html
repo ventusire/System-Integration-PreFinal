@@ -1,62 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/layout :: head('Stock Movement')}"></head>
+
 <body>
-<nav th:replace="~{fragments/layout :: navbar}"></nav>
-<div class="container py-5" style="max-width:520px">
-    <h4 class="fw-bold mb-4"><i class="bi bi-arrow-left-right me-2"></i>Record Stock Movement</h4>
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-            <div class="mb-3">
-                <label class="form-label">Product <span class="text-danger">*</span></label>
-                <select id="productSelect" class="form-select">
-                    <option value="">-- Select Product --</option>
-                    <option th:each="p : ${products}" th:value="${p.id}"
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+    <div class="container py-5" style="max-width:520px">
+        <h4 class="fw-bold mb-4"><i class="bi bi-arrow-left-right me-2"></i>Record Stock Transactions</h4>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label class="form-label">Product <span class="text-danger">*</span></label>
+                    <select id="productSelect" class="form-select">
+                        <option value="">-- Select Product --</option>
+                        <option th:each="p : ${products}" th:value="${p.id}"
                             th:text="${p.name} + ' (' + ${p.sku} + ') — Stock: ' + ${p.stockQuantity}">Product</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                <input type="number" id="qtyInput" class="form-control" min="1" value="1"/>
-            </div>
-            <div class="mb-4">
-                <label class="form-label">Reason <span class="text-muted small">(optional)</span></label>
-                <input type="text" id="reasonInput" class="form-control" placeholder="e.g. Purchase Order #001 / Sold to customer"/>
-            </div>
-            <div class="d-grid gap-2">
-                <form id="inForm" th:action="@{/transactions/stock-in}" method="post">
-                    <input type="hidden" name="productId" id="inProductId"/>
-                    <input type="hidden" name="quantity" id="inQty"/>
-                    <input type="hidden" name="reason"   id="inReason"/>
-                    <button type="submit" class="btn btn-success w-100 py-2" onclick="fillForm('in')">
-                        <i class="bi bi-arrow-up-circle me-2"></i>Stock IN (Add Stock)
-                    </button>
-                </form>
-                <form id="outForm" th:action="@{/transactions/stock-out}" method="post">
-                    <input type="hidden" name="productId" id="outProductId"/>
-                    <input type="hidden" name="quantity"  id="outQty"/>
-                    <input type="hidden" name="reason"    id="outReason"/>
-                    <button type="submit" class="btn btn-danger w-100 py-2" onclick="fillForm('out')">
-                        <i class="bi bi-arrow-down-circle me-2"></i>Stock OUT (Remove Stock)
-                    </button>
-                </form>
-                <a th:href="@{/transactions}" class="btn btn-outline-secondary">Cancel</a>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                    <input type="number" id="qtyInput" class="form-control" min="1" value="1" />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Reason <span class="text-muted small">(optional)</span></label>
+                    <input type="text" id="reasonInput" class="form-control"
+                        placeholder="e.g. Purchase Order #001 / Sold to customer" />
+                </div>
+                <div class="d-grid gap-2">
+                    <form id="inForm" th:action="@{/transactions/stock-in}" method="post">
+                        <input type="hidden" name="productId" id="inProductId" />
+                        <input type="hidden" name="quantity" id="inQty" />
+                        <input type="hidden" name="reason" id="inReason" />
+                        <button type="submit" class="btn btn-success w-100 py-2" onclick="fillForm('in')">
+                            <i class="bi bi-arrow-up-circle me-2"></i>Stock IN (Add Stock)
+                        </button>
+                    </form>
+                    <form id="outForm" th:action="@{/transactions/stock-out}" method="post">
+                        <input type="hidden" name="productId" id="outProductId" />
+                        <input type="hidden" name="quantity" id="outQty" />
+                        <input type="hidden" name="reason" id="outReason" />
+                        <button type="submit" class="btn btn-danger w-100 py-2" onclick="fillForm('out')">
+                            <i class="bi bi-arrow-down-circle me-2"></i>Stock OUT (Remove Stock)
+                        </button>
+                    </form>
+                    <a th:href="@{/transactions}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<footer th:replace="~{fragments/layout :: footer}"></footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function fillForm(type) {
-    const pid = document.getElementById('productSelect').value;
-    const qty = document.getElementById('qtyInput').value;
-    const rsn = document.getElementById('reasonInput').value;
-    if (!pid) { alert('Please select a product.'); event.preventDefault(); return; }
-    document.getElementById(type + 'ProductId').value = pid;
-    document.getElementById(type + 'Qty').value = qty;
-    document.getElementById(type + 'Reason').value = rsn;
-}
-</script>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function fillForm(type) {
+            const pid = document.getElementById('productSelect').value;
+            const qty = document.getElementById('qtyInput').value;
+            const rsn = document.getElementById('reasonInput').value;
+            if (!pid) { alert('Please select a product.'); event.preventDefault(); return; }
+            document.getElementById(type + 'ProductId').value = pid;
+            document.getElementById(type + 'Qty').value = qty;
+            document.getElementById(type + 'Reason').value = rsn;
+        }
+    </script>
 </body>
+
 </html>

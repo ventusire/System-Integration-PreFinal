@@ -50,8 +50,8 @@
                         </td>
                         <td class="text-end pe-4">
                             <a th:href="@{/products/edit/{id}(id=${p.id})}" class="btn btn-sm btn-light text-secondary me-1 rounded-2"><i class="bi bi-pencil"></i></a>
-                            <form th:action="@{/products/delete/{id}(id=${p.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete this product?')">
-                                <button class="btn btn-sm btn-light text-danger rounded-2"><i class="bi bi-trash"></i></button>
+                            <form th:action="@{/products/delete/{id}(id=${p.id})}" method="post" class="d-inline delete-form">
+                                <button type="button" class="btn btn-sm btn-light text-danger rounded-2 delete-btn"><i class="bi bi-trash"></i></button>
                             </form>
                         </td>
                     </tr>
@@ -156,6 +156,26 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         currentPage = 1;
         renderTable();
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
     });
     
     renderTable();
