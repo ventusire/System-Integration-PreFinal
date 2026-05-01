@@ -3,30 +3,44 @@
 <head th:replace="~{fragments/layout :: head('Categories')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<div class="container py-5">
+<div class="container-fluid px-4 py-5" style="max-width: 1400px; margin: 0 auto;">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0"><i class="bi bi-tags me-2 text-success"></i>Categories</h4>
-        <a th:href="@{/categories/new}" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i>Add Category</a>
+        <h2 class="dashboard-title mb-0"><i class="bi bi-tags me-2 text-success"></i>Categories</h2>
+        <a th:href="@{/categories/new}" class="btn btn-primary rounded-pill px-4 fw-medium"><i class="bi bi-plus-lg me-2"></i>Add Category</a>
     </div>
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-    <div class="row g-3">
-        <div class="col-md-4" th:each="c : ${categories}">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="fw-bold mb-1" th:text="${c.name}">Name</h6>
-                        <small class="text-muted" th:text="${c.description}">Description</small>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <a th:href="@{/categories/edit/{id}(id=${c.id})}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
-                        <form th:action="@{/categories/delete/{id}(id=${c.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete?')">
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    
+    <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9 !important;">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0 w-100">
+                <thead>
+                    <tr><th>Category Name</th><th>Description</th><th class="text-end pe-4">Actions</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${categories}">
+                        <td style="width: 30%;">
+                            <div class="product-cell">
+                                <div class="product-icon-box shadow-sm" style="background: #dcfce7; color: #16a34a;"><i class="bi bi-tag"></i></div>
+                                <div class="fw-bold text-dark" th:text="${c.name}">Name</div>
+                            </div>
+                        </td>
+                        <td class="text-muted small fw-medium" th:text="${c.description}">Description</td>
+                        <td class="text-end pe-4">
+                            <a th:href="@{/categories/edit/{id}(id=${c.id})}" class="btn btn-sm btn-light text-secondary me-1 rounded-2"><i class="bi bi-pencil"></i></a>
+                            <form th:action="@{/categories/delete/{id}(id=${c.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete?')">
+                                <button class="btn btn-sm btn-light text-danger rounded-2"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${categories.isEmpty()}">
+                        <td colspan="3" class="text-center text-muted py-5">
+                            <i class="bi bi-tags-fill fs-1 d-block mb-3 text-secondary"></i>
+                            <p class="mb-0">No categories yet.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="col-12 text-center text-muted py-4" th:if="${categories.isEmpty()}">No categories yet.</div>
     </div>
 </div>
 <footer th:replace="~{fragments/layout :: footer}"></footer>

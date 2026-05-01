@@ -3,33 +3,43 @@
 <head th:replace="~{fragments/layout :: head('Suppliers')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<div class="container py-5">
+<div class="container-fluid px-4 py-5" style="max-width: 1400px; margin: 0 auto;">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-purple"></i>Suppliers</h4>
-        <a th:href="@{/suppliers/new}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Supplier</a>
+        <h2 class="dashboard-title mb-0"><i class="bi bi-truck me-2 text-primary" style="color: var(--purple) !important;"></i>Suppliers</h2>
+        <a th:href="@{/suppliers/new}" class="btn btn-primary rounded-pill px-4 fw-medium"><i class="bi bi-plus-lg me-2"></i>Add Supplier</a>
     </div>
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-    <div class="card border-0 shadow-sm">
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9 !important;">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-header">
-                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Actions</th></tr>
+            <table class="table table-custom mb-0 w-100">
+                <thead>
+                    <tr><th>Supplier Details</th><th>Contact Info</th><th>Address</th><th class="text-end pe-4">Actions</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="s : ${suppliers}">
-                        <td class="fw-semibold" th:text="${s.name}">Name</td>
-                        <td th:text="${s.email}">email</td>
-                        <td th:text="${s.phone}">phone</td>
-                        <td class="text-muted small" th:text="${s.address}">address</td>
                         <td>
-                            <a th:href="@{/suppliers/edit/{id}(id=${s.id})}" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-pencil"></i></a>
+                            <div class="product-cell">
+                                <div class="product-icon-box shadow-sm" style="background: #eff6ff; color: #3b82f6;"><i class="bi bi-building"></i></div>
+                                <div class="fw-bold text-dark" th:text="${s.name}">Name</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-dark small fw-medium mb-1"><i class="bi bi-envelope text-muted me-2"></i><span th:text="${s.email}">email</span></div>
+                            <div class="text-dark small fw-medium"><i class="bi bi-telephone text-muted me-2"></i><span th:text="${s.phone}">phone</span></div>
+                        </td>
+                        <td class="text-muted small fw-medium" th:text="${s.address}">address</td>
+                        <td class="text-end pe-4">
+                            <a th:href="@{/suppliers/edit/{id}(id=${s.id})}" class="btn btn-sm btn-light text-secondary me-1 rounded-2"><i class="bi bi-pencil"></i></a>
                             <form th:action="@{/suppliers/delete/{id}(id=${s.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete?')">
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button class="btn btn-sm btn-light text-danger rounded-2"><i class="bi bi-trash"></i></button>
                             </form>
                         </td>
                     </tr>
                     <tr th:if="${suppliers.isEmpty()}">
-                        <td colspan="5" class="text-center text-muted py-4">No suppliers yet.</td>
+                        <td colspan="4" class="text-center text-muted py-5">
+                            <i class="bi bi-building-x fs-1 d-block mb-3 text-secondary"></i>
+                            <p class="mb-0">No suppliers yet.</p>
+                        </td>
                     </tr>
                 </tbody>
             </table>
