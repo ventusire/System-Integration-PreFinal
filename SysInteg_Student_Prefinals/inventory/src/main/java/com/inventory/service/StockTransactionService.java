@@ -71,8 +71,19 @@ public class StockTransactionService {
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Return all transactions for a specific product.
     public List<StockTransaction> getTransactionsByProduct(Long productId) {
-        // TODO: return transactionRepository.findByProduct(productId)
-        throw new UnsupportedOperationException("TODO 2 — getTransactionsByProduct not implemented yet");
+        // WHAT: This method returns every stock transaction (STOCK_IN / STOCK_OUT)
+        //       that belongs to a single product, identified by its id.
+        // WHY:  The product detail / history page needs to show the full audit
+        //       trail for one product — when stock came in, when it went out,
+        //       how much, and why. Without this, the per-product history view
+        //       would have no data source.
+        // HOW:  This is a thin service-layer delegation — there is no extra
+        //       business logic here, so we simply forward the productId to the
+        //       repository's findByProduct(...) which runs the actual SQL
+        //       (SELECT ... FROM stock_transactions WHERE product_id = ?).
+        //       The repository handles the JdbcTemplate binding safely so we
+        //       just return whatever list it produces (possibly empty).
+        return transactionRepository.findByProduct(productId);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
@@ -89,8 +100,47 @@ public class StockTransactionService {
      */
     @Transactional
     public StockTransaction addStock(Long productId, int quantity, String reason) {
-        // TODO: follow the steps above
-        throw new UnsupportedOperationException("TODO 3 — addStock not implemented yet");
+        // WHAT: This method increases a product's stock by `quantity` and writes
+        //       a matching STOCK_IN row to the stock_transactions table so the
+        //       change is auditable. It returns the saved transaction (with id).
+        // WHY:  The "Add Stock" form on the inventory page needs a single
+        //       service call that does BOTH the stock update AND the audit log
+        //       atomically — if either step fails, neither should persist.
+        //       That's why the method is @Transactional: Spring will roll back
+        //       the UPDATE if the INSERT (or anything after it) blows up.
+        // HOW:  Step 1 — load the product via productRepository.findById(...).
+        //       That returns Optional<Product>; we unwrap it with orElseThrow
+        //       so a missing id surfaces as a clear RuntimeException instead
+        //       of a NullPointerException later on.
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+
+        // Step 2 — compute the new stock level (current + incoming quantity).
+        //          Using the product loaded above keeps things consistent with
+        //          what the user is about to see in the audit row.
+        int newQty = product.getStockQuantity() + quantity;
+
+        // Step 3 — push the new quantity to the DB. updateStock runs a plain
+        //          UPDATE products SET stock_quantity = ? WHERE id = ? via
+        //          JdbcTemplate, so the bindings are SQL-injection safe.
+        productRepository.updateStock(productId, newQty);
+
+        // Step 4 — build the audit row. type = STOCK_IN (the repository will
+        //          store this as enum.name() text in the DB), transactionDate
+        //          defaults to now() in the model but we set it explicitly so
+        //          the intent is obvious. The full Product is attached so the
+        //          repository can persist its FK (product_id).
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(product);
+        tx.setType(StockTransaction.Type.STOCK_IN);
+        tx.setQuantity(quantity);
+        tx.setReason(reason);
+        tx.setTransactionDate(LocalDateTime.now());
+
+        // Step 5 — save and return. The repository uses a KeyHolder under the
+        //          hood to fetch the generated id and stamps it back onto the
+        //          returned object, so callers can reference the new tx row.
+        return transactionRepository.save(tx);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
@@ -108,7 +158,52 @@ public class StockTransactionService {
      */
     @Transactional
     public StockTransaction removeStock(Long productId, int quantity, String reason) {
-        // TODO: follow the steps above — pay attention to the stock check in step 2
-        throw new UnsupportedOperationException("TODO 4 — removeStock not implemented yet");
+        // WHAT: This method decreases a product's stock by `quantity` and writes
+        //       a matching STOCK_OUT row to the stock_transactions table. It
+        //       refuses to over-draw — if there isn't enough stock on hand it
+        //       throws and nothing is persisted.
+        // WHY:  Removing stock has a real-world business rule the UI alone
+        //       can't be trusted to enforce: you cannot ship more than you
+        //       physically have. Centralizing the check here means every
+        //       caller (form, API, future job) is protected. @Transactional
+        //       guarantees the UPDATE and the audit INSERT live or die together.
+        // HOW:  Step 1 — load the product via findById(...). It returns an
+        //       Optional<Product> so we unwrap with orElseThrow; a missing
+        //       id becomes a clear RuntimeException instead of a NPE later.
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+
+        // Step 2 — guard against over-removal. If the requested quantity is
+        //          larger than what's on hand we abort BEFORE touching the DB.
+        //          The exception message includes the available stock so the
+        //          controller can surface a useful error back to the user.
+        if (product.getStockQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock. Available: " + product.getStockQuantity());
+        }
+
+        // Step 3 — compute the new stock level (current - outgoing quantity).
+        int newQty = product.getStockQuantity() - quantity;
+
+        // Step 4 — push the new quantity to the DB. updateStock runs a plain
+        //          UPDATE products SET stock_quantity = ? WHERE id = ? via
+        //          JdbcTemplate, so the bindings are SQL-injection safe.
+        productRepository.updateStock(productId, newQty);
+
+        // Step 5 — build the audit row. type = STOCK_OUT (the repository will
+        //          store this as enum.name() text in the DB), transactionDate
+        //          is set explicitly so the timestamp matches "now" rather than
+        //          object-construction time. The full Product is attached so
+        //          the repository can persist its FK (product_id).
+        StockTransaction tx = new StockTransaction();
+        tx.setProduct(product);
+        tx.setType(StockTransaction.Type.STOCK_OUT);
+        tx.setQuantity(quantity);
+        tx.setReason(reason);
+        tx.setTransactionDate(LocalDateTime.now());
+
+        // Step 6 — save and return. The repository uses a KeyHolder under the
+        //          hood to fetch the generated id and stamps it back onto the
+        //          returned object, so callers can reference the new tx row.
+        return transactionRepository.save(tx);
     }
 }
