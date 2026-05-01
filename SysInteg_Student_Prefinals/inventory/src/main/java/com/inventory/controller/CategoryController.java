@@ -49,9 +49,8 @@ public class CategoryController {
     // then return the template name "categories/form".
     @GetMapping("/new")
     public String newForm(Model model) {
-        // TODO: model.addAttribute("category", new Category());
-        //       return "categories/form";
-        throw new UnsupportedOperationException("TODO 1 — newForm not implemented yet");
+        model.addAttribute("category", new Category());
+        return "categories/form";
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
@@ -60,9 +59,8 @@ public class CategoryController {
     // then return "categories/form".
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
-        // TODO: categoryService.getCategoryById(id).ifPresent(c -> model.addAttribute("category", c));
-        //       return "categories/form";
-        throw new UnsupportedOperationException("TODO 2 — editForm not implemented yet");
+        categoryService.getCategoryById(id).ifPresent(c -> model.addAttribute("category", c));
+        return "categories/form";
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
@@ -72,11 +70,12 @@ public class CategoryController {
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute Category category, BindingResult result,
                        RedirectAttributes flash) {
-        // TODO: check result.hasErrors() → return "categories/form"
-        //       categoryService.saveCategory(category)
-        //       flash.addFlashAttribute("success", "Category saved!")
-        //       return "redirect:/categories"
-        throw new UnsupportedOperationException("TODO 3 — save not implemented yet");
+        if (result.hasErrors()) {
+            return "categories/form";
+        }
+        categoryService.saveCategory(category);
+        flash.addFlashAttribute("success", "Category saved!");
+        return "redirect:/categories";
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
@@ -84,9 +83,8 @@ public class CategoryController {
     // Delete the category and redirect back to /categories with a message.
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
-        // TODO: categoryService.deleteCategory(id)
-        //       flash.addFlashAttribute("success", "Category deleted.")
-        //       return "redirect:/categories"
-        throw new UnsupportedOperationException("TODO 4 — delete not implemented yet");
+        categoryService.deleteCategory(id);
+        flash.addFlashAttribute("success", "Category deleted.");
+        return "redirect:/categories";
     }
 }
