@@ -7,16 +7,16 @@
     <h4 class="fw-bold mb-4" th:text="${category.id == null ? 'Add Category' : 'Edit Category'}">Form</h4>
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <form th:action="@{/categories/save}" th:object="${category}" method="post">
+            <form id="categoryForm" th:action="@{/categories/save}" th:object="${category}" method="post">
                 <input type="hidden" th:field="*{id}"/>
                 <div class="mb-3">
                     <label class="form-label">Name <span class="text-danger">*</span></label>
-                    <input type="text" th:field="*{name}" class="form-control"/>
+                    <input type="text" th:field="*{name}" class="form-control" required minlength="2" maxlength="100"/>
                     <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Description</label>
-                    <input type="text" th:field="*{description}" class="form-control"/>
+                    <input type="text" th:field="*{description}" class="form-control" maxlength="255"/>
                 </div>
                 <div class="row g-2 mt-2">
                     <div class="col-6">
@@ -30,13 +30,28 @@
         </div>
     </div>
 </div>
+<!-- Passes server-side errors to JS -->
+<span id="nameErrorMsg" th:if="${nameError}" th:text="${nameError}" style="display:none;"></span>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const cancelBtn = document.getElementById('cancelBtn');
-    const form = document.querySelector('form');
-    
+    const form = document.getElementById('categoryForm');
+
+    // Show SweetAlert if a duplicate name error was returned from the server
+    const nameErrorEl = document.getElementById('nameErrorMsg');
+    if (nameErrorEl) {
+        Swal.fire({
+            title: 'Duplicate Category Name',
+            text: nameErrorEl.textContent.trim(),
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+    }
+
     cancelBtn.addEventListener('click', function(e) {
         e.preventDefault();
         const href = this.getAttribute('href');
@@ -57,8 +72,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        const nameVal = form.querySelector('input[name="name"]').value.trim();
+        if (!nameVal) {
+            Swal.fire('Validation Error', 'Category name is required.', 'error');
+            return;
+        }
+        const isEdit = form.querySelector('input[name="id"]').value !== '';
         Swal.fire({
-            title: 'Save Category?',
+            title: isEdit ? 'Update Category?' : 'Save Category?',
             text: "Are you sure you want to save this category?",
             icon: 'question',
             showCancelButton: true,
@@ -75,3 +96,4 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 </body>
 </html>
+

@@ -1,6 +1,7 @@
 package com.inventory.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -103,7 +104,25 @@ public String save(@Valid @ModelAttribute Product product, BindingResult result,
         model.addAttribute("suppliers", supplierService.getAllSuppliers());
         return "products/form";
     }
-    productService.saveProduct(product);
+
+    // Pre-check for duplicate SKU (handles both new and edit)
+    boolean skuConflict = productService.isSkuTakenByAnother(product.getSku(), product.getId());
+    if (skuConflict) {
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        model.addAttribute("skuError", "A product with this SKU already exists.");
+        return "products/form";
+    }
+
+    try {
+        productService.saveProduct(product);
+    } catch (DuplicateKeyException ex) {
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        model.addAttribute("skuError", "A product with this SKU already exists.");
+        return "products/form";
+    }
+
     flash.addFlashAttribute("success", "Product saved successfully!");
     return "redirect:/products";
 }

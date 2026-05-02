@@ -62,8 +62,17 @@ public Product saveProduct(Product product) {
     // ── TODO 7 ──────────────────────────────────────────────────────────────
     // Return true if the given SKU is already used by another product.
     public boolean isSkuTaken(String sku) {
-        // TODO: return productRepository.existsBySku(sku)
-        throw new UnsupportedOperationException("TODO 7 — isSkuTaken not implemented yet");
+        return productRepository.existsBySku(sku);
+    }
+
+    /**
+     * Returns true if the given SKU is already used by a product OTHER than
+     * the one with excludeId.  Pass excludeId = null when creating a new product.
+     */
+    public boolean isSkuTakenByAnother(String sku, Long excludeId) {
+        return productRepository.findBySku(sku)
+                .map(existing -> !existing.getId().equals(excludeId))
+                .orElse(false);
     }
 
     // ── TODO 8 (BONUS) ──────────────────────────────────────────────────────

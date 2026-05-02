@@ -49,4 +49,14 @@ public class SupplierService {
         // Calls the repository to check if any supplier already exists with this exact email
         return supplierRepository.existsByEmail(email);
     }
+
+    /**
+     * Returns true if the email is taken by a supplier OTHER than the one with excludeId.
+     * Pass excludeId = null when creating a new supplier.
+     */
+    public boolean isEmailTakenByAnother(String email, Long excludeId) {
+        return supplierRepository.findByEmail(email)
+                .map(existing -> !existing.getId().equals(excludeId))
+                .orElse(false);
+    }
 }

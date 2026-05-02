@@ -59,25 +59,25 @@ public class SupplierController {
     // Validate, save, redirect with flash message.
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute Supplier supplier, BindingResult result,
-            RedirectAttributes flash) {
+            Model model, RedirectAttributes flash) {
         if (result.hasErrors()) {
             return "suppliers/form";
         }
 
-        // Check email uniqueness
-        if (supplier.getId() == null && supplierService.isEmailTaken(supplier.getEmail())) {
-            result.rejectValue("email", "error.supplier", "Email is already taken");
+        // Pre-check for duplicate email (edit-safe: excludes current supplier's own email)
+        if (supplier.getEmail() != null && !supplier.getEmail().isBlank()
+                && supplierService.isEmailTakenByAnother(supplier.getEmail(), supplier.getId())) {
+            model.addAttribute("emailError", "A supplier with this email already exists.");
             return "suppliers/form";
-        } else if (supplier.getId() != null) {
-            Supplier existing = supplierService.getSupplierById(supplier.getId()).orElse(null);
-            if (existing != null && !existing.getEmail().equals(supplier.getEmail())
-                    && supplierService.isEmailTaken(supplier.getEmail())) {
-                result.rejectValue("email", "error.supplier", "Email is already taken");
-                return "suppliers/form";
-            }
         }
 
-        supplierService.saveSupplier(supplier);
+        try {
+            supplierService.saveSupplier(supplier);
+        } catch (org.springframework.dao.DuplicateKeyException ex) {
+            model.addAttribute("emailError", "A supplier with this email already exists.");
+            return "suppliers/form";
+        }
+
         flash.addFlashAttribute("success", "Supplier successfully saved!");
         return "redirect:/suppliers";
     }

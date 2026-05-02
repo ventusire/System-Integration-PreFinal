@@ -53,4 +53,14 @@ public class CategoryService {
     public boolean isNameTaken(String name) {
         return categoryRepository.existsByName(name);
     }
+
+    /**
+     * Returns true if the name is taken by a category OTHER than the one with excludeId.
+     * Pass excludeId = null when creating a new category.
+     */
+    public boolean isNameTakenByAnother(String name, Long excludeId) {
+        return categoryRepository.findByName(name)
+                .map(existing -> !existing.getId().equals(excludeId))
+                .orElse(false);
+    }
 }

@@ -66,15 +66,26 @@ public class CategoryController {
 
     // ── Save ────────────────────────────────────────────────────────────────
     // POST /categories/save
-    // If validation errors exist → return the form again.
-    // Otherwise save and redirect to /categories with a success message.
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute Category category, BindingResult result,
-                       RedirectAttributes flash) {
+                       Model model, RedirectAttributes flash) {
         if (result.hasErrors()) {
             return "categories/form";
         }
-        categoryService.saveCategory(category);
+
+        // Pre-check for duplicate category name
+        if (categoryService.isNameTakenByAnother(category.getName(), category.getId())) {
+            model.addAttribute("nameError", "A category with this name already exists.");
+            return "categories/form";
+        }
+
+        try {
+            categoryService.saveCategory(category);
+        } catch (org.springframework.dao.DuplicateKeyException ex) {
+            model.addAttribute("nameError", "A category with this name already exists.");
+            return "categories/form";
+        }
+
         flash.addFlashAttribute("success", "Category saved!");
         return "redirect:/categories";
     }

@@ -3,12 +3,15 @@
 <head th:replace="~{fragments/layout :: head('Suppliers')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<!-- Hidden span carries flash message from server to JS -->
+<span id="successMsg" th:if="${success}" th:text="${success}" style="display:none;"></span>
+
 <div class="container-fluid px-4 py-5" style="max-width: 1400px; margin: 0 auto;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="dashboard-title mb-0"><i class="bi bi-truck me-2 text-primary" style="color: var(--purple) !important;"></i>Suppliers</h2>
         <a th:href="@{/suppliers/new}" class="btn btn-primary rounded-pill px-4 fw-medium"><i class="bi bi-plus-lg me-2"></i>Add Supplier</a>
     </div>
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
     <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9 !important;">
         <div class="table-responsive">
             <table class="table table-custom mb-0 w-100">
@@ -51,6 +54,23 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:src="@{/js/main.js}"></script>
 <script>
+    // Fire success SweetAlert on redirect after add / edit / delete
+    document.addEventListener('DOMContentLoaded', function () {
+        const msgEl = document.getElementById('successMsg');
+        if (msgEl) {
+            Swal.fire({
+                title: 'Success!',
+                text: msgEl.textContent.trim(),
+                icon: 'success',
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+    });
+
     function confirmDelete(event, form) {
         event.preventDefault();
         Swal.fire({

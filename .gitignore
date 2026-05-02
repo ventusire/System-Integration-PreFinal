@@ -19,6 +19,7 @@ Desktop.ini
 *.p12
 *.pfx
 secrets/
+.qodo/
 
 ## Logs
 *.log
