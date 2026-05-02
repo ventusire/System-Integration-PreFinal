@@ -115,6 +115,27 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); }
 .action-title { font-weight: 600; font-size: 1.25rem; color: var(--navy); margin-bottom: 8px; }
 .action-desc { color: #64748b; font-size: 0.9rem; margin: 0; }
 
+/* Category Filter Buttons */
+.category-filter-btn {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+.category-filter-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+.category-filter-btn.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #ffffff;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }

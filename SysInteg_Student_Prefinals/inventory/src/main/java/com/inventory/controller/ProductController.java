@@ -53,6 +53,7 @@ public class ProductController {
         } else {
             model.addAttribute("products", productService.getAllProducts());
         }
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "products/list";
     }
 

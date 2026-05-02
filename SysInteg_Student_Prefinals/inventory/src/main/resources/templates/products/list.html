@@ -53,15 +53,22 @@
           <button
             type="button"
             class="btn btn-dark px-4 rounded-3 fw-medium"
-            onclick="
-              document.getElementById('liveSearch').value = '';
-              document
-                .getElementById('liveSearch')
-                .dispatchEvent(new Event('input'));
-            "
+            id="clearBtn"
           >
             Clear
           </button>
+        </div>
+        <div class="d-flex gap-2 flex-wrap px-2 pb-2">
+          <button type="button" class="btn btn-sm category-filter-btn active" data-category="all">
+            <i class="bi bi-grid me-1"></i>All
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm category-filter-btn"
+            th:each="cat : ${categories}"
+            th:attr="data-category=${cat.name}"
+            th:text="${cat.name}"
+          >Category</button>
         </div>
       </div>
 
@@ -87,7 +94,7 @@
               </tr>
             </thead>
             <tbody id="productTableBody">
-              <tr th:each="p : ${products}" class="product-row">
+              <tr th:each="p : ${products}" class="product-row" th:attr="data-category=${p.category != null ? p.category.name : ''}">
                 <td style="width: 30%">
                   <div class="product-cell">
                     <div class="product-icon-box shadow-sm">
@@ -212,6 +219,18 @@
         const itemsPerPage = 5;
         let currentPage = 1;
         let filteredRows = [...rows];
+        let activeCategory = "all";
+
+        function applyFilters() {
+          const term = searchInput.value.toLowerCase();
+          filteredRows = rows.filter((row) => {
+            const matchesSearch = term === "" || row.textContent.toLowerCase().includes(term);
+            const matchesCategory = activeCategory === "all" || row.dataset.category === activeCategory;
+            return matchesSearch && matchesCategory;
+          });
+          currentPage = 1;
+          renderTable();
+        }
 
         function renderTable() {
           const totalPages = Math.ceil(filteredRows.length / itemsPerPage) || 1;
@@ -222,23 +241,17 @@
 
           const start = (currentPage - 1) * itemsPerPage;
           const end = start + itemsPerPage;
-          const pageRows = filteredRows.slice(start, end);
+          filteredRows.slice(start, end).forEach((row) => (row.style.display = ""));
 
-          pageRows.forEach((row) => (row.style.display = ""));
-
-          if (filteredRows.length === 0 && rows.length > 0) {
-            if (noResultsRow) noResultsRow.style.display = "";
-          } else {
-            if (noResultsRow) noResultsRow.style.display = "none";
+          if (noResultsRow) {
+            noResultsRow.style.display = filteredRows.length === 0 && rows.length > 0 ? "" : "none";
           }
 
           renderPagination(totalPages);
         }
 
         function renderPagination(totalPages) {
-          const paginationContainer = document.getElementById(
-            "paginationContainer",
-          );
+          const paginationContainer = document.getElementById("paginationContainer");
           if (!paginationContainer) return;
           paginationContainer.innerHTML = "";
 
@@ -260,12 +273,7 @@
             link.addEventListener("click", function (e) {
               e.preventDefault();
               const parent = this.parentElement;
-              if (
-                parent.classList.contains("disabled") ||
-                parent.classList.contains("active")
-              )
-                return;
-
+              if (parent.classList.contains("disabled") || parent.classList.contains("active")) return;
               const page = parseInt(this.getAttribute("data-page"));
               if (page >= 1 && page <= totalPages) {
                 currentPage = page;
@@ -275,14 +283,23 @@
           });
         }
 
-        searchInput.addEventListener("input", function (e) {
-          const term = e.target.value.toLowerCase();
-          filteredRows = rows.filter((row) => {
-            const text = row.textContent.toLowerCase();
-            return text.includes(term);
+        searchInput.addEventListener("input", applyFilters);
+
+        document.getElementById("clearBtn").addEventListener("click", function () {
+          searchInput.value = "";
+          activeCategory = "all";
+          document.querySelectorAll(".category-filter-btn").forEach((b) => b.classList.remove("active"));
+          document.querySelector('.category-filter-btn[data-category="all"]').classList.add("active");
+          applyFilters();
+        });
+
+        document.querySelectorAll(".category-filter-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            document.querySelectorAll(".category-filter-btn").forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
+            activeCategory = this.dataset.category;
+            applyFilters();
           });
-          currentPage = 1;
-          renderTable();
         });
 
         document.querySelectorAll(".delete-btn").forEach((btn) => {
