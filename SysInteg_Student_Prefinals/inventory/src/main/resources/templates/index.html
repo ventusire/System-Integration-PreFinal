@@ -1,238 +1,1061 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
 
-<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
-
-<body>
+  <body>
     <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-    <div class="container-fluid px-4 py-5" style="max-width: 1400px; margin: 0 auto;">
+    <div
+      class="container-fluid px-4 py-5"
+      style="max-width: 1400px; margin: 0 auto"
+    >
+      <!-- ✨ Enhanced Top Hero Section -->
+      <div class="row mb-5 align-items-center">
+        <div class="col-lg-8">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <div
+              class="icon-badge bg-primary bg-opacity-10 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center"
+              style="width: 48px; height: 48px"
+            >
+              <i class="bi bi-box-seam fs-4"></i>
+            </div>
+            <div>
+              <h1
+                class="dashboard-title mb-1 fw-extrabold"
+                style="font-size: 2.2rem; letter-spacing: -0.5px"
+              >
+                Inventory Command Center
+              </h1>
+              <p
+                class="dashboard-subtitle text-secondary-emphasis mb-0 fw-medium"
+              >
+                <i class="bi bi-arrow-repeat me-2 text-primary"></i>Real‑time
+                stock intelligence, movements, and critical alerts unified in
+                one workspace.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 mt-4 mt-lg-0" th:if="${outOfStockCount > 0}">
+          <div
+            class="alert-card d-flex gap-3 align-items-start p-4 rounded-4 border border-danger-subtle bg-danger bg-opacity-10 shadow-sm"
+          >
+            <div class="icon-stack bg-white rounded-circle p-2 shadow-sm">
+              <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-danger mb-1">Critical Stock Breach</h5>
+              <p
+                class="mb-0 text-danger-emphasis fw-semibold"
+                th:text="${outOfStockCount} + ' product(s) have hit zero inventory. Immediate restock recommended.'"
+              >
+                3 product(s) have hit zero inventory.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <!-- Top Hero Section -->
-        <div class="row mb-5 align-items-center">
-            <div class="col-lg-8">
-                <h1 class="dashboard-title mb-2">Inventory Management System</h1>
-                <p class="dashboard-subtitle">Track products, manage stock levels, record movements, and monitor
-                    low-stock alerts — all in one place.</p>
+      <!-- 🔢 Enhanced KPI Cards Row -->
+      <div class="row g-4 mb-5">
+        <!-- Card 1: Total Products -->
+        <div class="col-sm-6 col-lg-3">
+          <div
+            class="kpi-wrapper enhanced-card border-0 rounded-4 p-4 h-100 shadow-sm"
+            style="
+              background: linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%);
+              border-left: 4px solid #3b82f6;
+            "
+          >
+            <div
+              class="kpi-header d-flex justify-content-between align-items-center mb-3"
+            >
+              <span
+                class="kpi-title fw-semibold text-uppercase small tracking-wider"
+                style="color: #3b82f6; letter-spacing: 0.8px"
+                >Total Products</span
+              >
+              <div
+                class="icon-circle rounded-3 d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background: rgba(59, 130, 246, 0.1);
+                  color: #3b82f6;
+                "
+              >
+                <i class="bi bi-clipboard2-check fs-5"></i>
+              </div>
             </div>
-            <div class="col-lg-4 mt-4 mt-lg-0" th:if="${outOfStockCount > 0}">
-                <div class="alert-card d-flex gap-3 align-items-start">
-                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4 mt-1"></i>
-                    <div>
-                        <h5>Critical Stock Alert</h5>
-                        <p th:text="${outOfStockCount} + ' Stock/s have reached zero inventory. Action required.'">3
-                            Stock/s have reached zero inventory.</p>
-                    </div>
-                </div>
+            <div
+              class="kpi-number display-5 fw-bold text-dark mb-2"
+              th:text="${totalProducts}"
+              style="font-size: 2.8rem"
+            >
+              0
             </div>
+            <div
+              class="d-flex align-items-center text-success small fw-semibold mt-1"
+            >
+              <i class="bi bi-graph-up-arrow me-2 fs-6"></i>
+              <span>Active catalog items</span>
+            </div>
+            <div class="progress mt-3" style="height: 4px; background: #e9ecef">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                style="width: 75%"
+                aria-valuenow="75"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
         </div>
 
-        <!-- KPI Cards Row -->
-        <div class="row g-4 mb-5">
-            <!-- Card 1: Total Products -->
-            <div class="col-sm-6 col-lg-3">
-                <div class="kpi-wrapper" style="background-color: #eff6ff;">
-                    <div class="kpi-header">
-                        <span class="kpi-title" style="color: #3b82f6;">TOTAL PRODUCTS</span>
-                        <div
-                            style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #bfdbfe; color: #3b82f6;">
-                            <i class="bi bi-clipboard2-check fs-6"></i>
-                        </div>
-                    </div>
-                    <div class="kpi-number" th:text="${totalProducts}">0</div>
-                    <div class="kpi-trend text-success"><i class="bi bi-graph-up-arrow me-1"></i> Active catalog items
-                    </div>
-                </div>
+        <!-- Card 2: Categories -->
+        <div class="col-sm-6 col-lg-3">
+          <div
+            class="kpi-wrapper enhanced-card border-0 rounded-4 p-4 h-100 shadow-sm"
+            style="
+              background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+              border-left: 4px solid #64748b;
+            "
+          >
+            <div
+              class="kpi-header d-flex justify-content-between align-items-center mb-3"
+            >
+              <span
+                class="kpi-title fw-semibold text-uppercase small tracking-wider"
+                style="color: #64748b; letter-spacing: 0.8px"
+                >Categories</span
+              >
+              <div
+                class="icon-circle rounded-3 d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background: rgba(100, 116, 139, 0.1);
+                  color: #64748b;
+                "
+              >
+                <i class="bi bi-tags fs-5"></i>
+              </div>
             </div>
-
-            <!-- Card 2: Categories -->
-            <div class="col-sm-6 col-lg-3">
-                <div class="kpi-wrapper" style="background-color: #f8fafc;">
-                    <div class="kpi-header">
-                        <span class="kpi-title" style="color: #64748b;">CATEGORIES</span>
-                        <div
-                            style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #64748b;">
-                            <i class="bi bi-tags fs-6"></i>
-                        </div>
-                    </div>
-                    <div class="kpi-number" th:text="${totalCategories}">0</div>
-                    <div class="kpi-trend text-muted"><i class="bi bi-dash me-1"></i> Well-organized catalog</div>
-                </div>
+            <div
+              class="kpi-number display-5 fw-bold text-dark mb-2"
+              th:text="${totalCategories}"
+              style="font-size: 2.8rem"
+            >
+              0
             </div>
-
-            <!-- Card 3: Low Stock -->
-            <div class="col-sm-6 col-lg-3">
-                <div class="kpi-wrapper" style="background-color: #fffbeb;">
-                    <div class="kpi-header">
-                        <span class="kpi-title" style="color: #d97706;">LOW STOCK</span>
-                        <div
-                            style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #d97706;">
-                            <i class="bi bi-exclamation-circle fs-6"></i>
-                        </div>
-                    </div>
-                    <div class="kpi-number" th:text="${lowStockCount}">0</div>
-                    <div class="kpi-trend warning"><i class="bi bi-exclamation-circle me-1"></i> Requires attention
-                    </div>
-                </div>
+            <div
+              class="d-flex align-items-center text-muted small fw-semibold mt-1"
+            >
+              <i class="bi bi-diagram-3 me-2 fs-6"></i>
+              <span>Well-organized catalog</span>
             </div>
-
-            <!-- Card 4: Out of Stock -->
-            <div class="col-sm-6 col-lg-3">
-                <div class="kpi-wrapper" style="background-color: #fef2f2;">
-                    <div class="kpi-header">
-                        <span class="kpi-title" style="color: #dc2626;">OUT OF STOCK</span>
-                        <div
-                            style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #fecaca; color: #dc2626;">
-                            <i class="bi bi-x-circle fs-6"></i>
-                        </div>
-                    </div>
-                    <div class="kpi-number" th:text="${outOfStockCount}">0</div>
-                    <div class="kpi-trend danger"><i class="bi bi-x-octagon me-1"></i> Critical Priority</div>
-                </div>
+            <div class="progress mt-3" style="height: 4px; background: #e9ecef">
+              <div
+                class="progress-bar bg-secondary"
+                role="progressbar"
+                style="width: 60%"
+                aria-valuenow="60"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
             </div>
+          </div>
         </div>
 
-        <!-- Tables Row -->
-        <div class="row g-4 mb-5">
-            <!-- Low Stock Alerts Table -->
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm h-100"
-                    style="border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9 !important;">
-                    <div
-                        class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0 text-dark">Low Stock Alerts</h5>
-                        <div class="d-flex gap-2">
-                            <a th:href="@{/transactions/new}"
-                                class="btn btn-primary btn-sm px-3 rounded-pill fw-medium">
-                                <i class="bi bi-plus-lg me-1"></i>Add Stock
-                            </a>
-                            <a th:href="@{/products}" class="btn btn-link text-decoration-none btn-sm fw-medium">View
-                                All Products</a>
-                        </div>
-                    </div>
-                    <div class="card-body px-4 pb-4 pt-0">
-                        <table class="table table-custom mb-0 w-100"
-                            th:if="${lowStockItems != null && !lowStockItems.isEmpty()}">
-                            <tbody>
-                                <tr th:each="p : ${lowStockItems}">
-                                    <td style="width: 50%;">
-                                        <div class="product-cell">
-                                            <div class="product-icon-box shadow-sm"><i class="bi bi-smartwatch"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold text-dark" th:text="${p.name}">Product Name</div>
-                                                <div class="text-muted small fw-medium" th:text="'SKU: ' + ${p.sku}">
-                                                    SKU: 123</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold"
-                                            th:classappend="${p.stockQuantity == 0 ? 'text-danger' : 'text-dark'}"
-                                            th:text="${p.stockQuantity} + ' Units Left'">0 Units Left</div>
-                                        <div class="progress mt-2"
-                                            style="height: 6px; border-radius: 6px; background: #f1f5f9;"
-                                            th:if="${p.stockQuantity > 0}">
-                                            <div class="progress-bar" role="progressbar"
-                                                th:style="'width: ' + (${p.stockQuantity} * 10) + '%; background-color: #a8a29e;'">
-                                            </div>
-                                        </div>
-                                        <div class="text-danger small fw-bold mt-1" th:if="${p.stockQuantity == 0}">Out
-                                            of Stock</div>
-                                    </td>
-                                    <td class="text-end">
-                                        <a th:href="@{/transactions/new}" class="btn btn-primary btn-sm px-4 fw-medium"
-                                            style="border-radius: 6px;">Restock</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="text-center py-5 text-muted"
-                            th:if="${lowStockItems == null || lowStockItems.isEmpty()}">
-                            <i class="bi bi-check-circle fs-1 text-success mb-3 d-block"></i>
-                            <p class="mb-0">All stock levels are healthy!</p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Card 3: Low Stock -->
+        <div class="col-sm-6 col-lg-3">
+          <div
+            class="kpi-wrapper enhanced-card border-0 rounded-4 p-4 h-100 shadow-sm"
+            style="
+              background: linear-gradient(145deg, #ffffff 0%, #fff7ed 100%);
+              border-left: 4px solid #d97706;
+            "
+          >
+            <div
+              class="kpi-header d-flex justify-content-between align-items-center mb-3"
+            >
+              <span
+                class="kpi-title fw-semibold text-uppercase small tracking-wider"
+                style="color: #d97706; letter-spacing: 0.8px"
+                >Low Stock</span
+              >
+              <div
+                class="icon-circle rounded-3 d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background: rgba(217, 119, 6, 0.1);
+                  color: #d97706;
+                "
+              >
+                <i class="bi bi-exclamation-circle fs-5"></i>
+              </div>
             </div>
-
-            <!-- Recent Transactions Table -->
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm h-100"
-                    style="border-radius: 12px; overflow: hidden; border: 1px solid #f1f5f9 !important;">
-                    <div
-                        class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0 text-dark">Recent Transactions</h5>
-                        <a th:href="@{/transactions}" class="text-secondary"><i class="bi bi-filter fs-4"></i></a>
-                    </div>
-                    <div class="card-body px-4 pb-4 pt-0">
-                        <table class="table table-custom mb-0 w-100" th:if="${recentTx != null && !recentTx.isEmpty()}">
-                            <tbody>
-                                <tr th:each="tx : ${recentTx}">
-                                    <td style="width: 50px;">
-                                        <div class="product-icon-box rounded-circle"
-                                            style="background: transparent; border: 1px solid #e2e8f0; width: 36px; height: 36px;"
-                                            th:classappend="${tx.type.name() == 'STOCK_IN' ? 'text-primary' : 'text-secondary'}">
-                                            <i class="bi"
-                                                th:classappend="${tx.type.name() == 'STOCK_IN' ? 'bi-plus-lg' : 'bi-arrow-left-right'}"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;"
-                                            th:text="${tx.type.name() == 'STOCK_IN' ? 'Stock Inbound: ' : 'Stock Outbound: '} + ${tx.product?.name}">
-                                            Action</div>
-                                        <div class="text-muted small fw-medium"
-                                            th:text="'Qty: ' + ${tx.type.name() == 'STOCK_IN' ? '+' : '-'} + ${tx.quantity}">
-                                            Qty: +50</div>
-                                    </td>
-                                    <td class="text-end text-muted small fw-medium"
-                                        th:text="${#temporals.format(tx.transactionDate,'MMM d, HH:mm')}">
-                                        2m ago
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="text-center py-5 text-muted" th:if="${recentTx == null || recentTx.isEmpty()}">
-                            <i class="bi bi-clock-history fs-1 text-secondary mb-3 d-block"></i>
-                            <p class="mb-0">No transactions yet.</p>
-                        </div>
-                    </div>
-                </div>
+            <div
+              class="kpi-number display-5 fw-bold text-dark mb-2"
+              th:text="${lowStockCount}"
+              style="font-size: 2.8rem"
+            >
+              0
             </div>
+            <div
+              class="d-flex align-items-center text-warning-emphasis small fw-semibold mt-1"
+            >
+              <i class="bi bi-exclamation-triangle me-2 fs-6"></i>
+              <span>Requires attention</span>
+            </div>
+            <div class="progress mt-3" style="height: 4px; background: #e9ecef">
+              <div
+                class="progress-bar bg-warning"
+                role="progressbar"
+                style="width: 30%"
+                aria-valuenow="30"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Action Cards Row -->
-        <div class="row g-4 mb-3">
-            <div class="col-md-4">
-                <a th:href="@{/products}" class="action-card">
-                    <div class="action-icon" style="background: #eff6ff; color: #3b82f6;"><i class="bi bi-upc-scan"></i>
-                    </div>
-                    <h4 class="action-title">View Products</h4>
-                    <p class="action-desc">Quick stock check or update</p>
+        <!-- Card 4: Out of Stock -->
+        <div class="col-sm-6 col-lg-3">
+          <div
+            class="kpi-wrapper enhanced-card border-0 rounded-4 p-4 h-100 shadow-sm"
+            style="
+              background: linear-gradient(145deg, #ffffff 0%, #fef2f2 100%);
+              border-left: 4px solid #dc2626;
+            "
+          >
+            <div
+              class="kpi-header d-flex justify-content-between align-items-center mb-3"
+            >
+              <span
+                class="kpi-title fw-semibold text-uppercase small tracking-wider"
+                style="color: #dc2626; letter-spacing: 0.8px"
+                >Out of Stock</span
+              >
+              <div
+                class="icon-circle rounded-3 d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  background: rgba(220, 38, 38, 0.1);
+                  color: #dc2626;
+                "
+              >
+                <i class="bi bi-x-circle fs-5"></i>
+              </div>
+            </div>
+            <div
+              class="kpi-number display-5 fw-bold text-dark mb-2"
+              th:text="${outOfStockCount}"
+              style="font-size: 2.8rem"
+            >
+              0
+            </div>
+            <div
+              class="d-flex align-items-center text-danger small fw-semibold mt-1"
+            >
+              <i class="bi bi-x-octagon me-2 fs-6"></i>
+              <span>Critical priority</span>
+            </div>
+            <div class="progress mt-3" style="height: 4px; background: #e9ecef">
+              <div
+                class="progress-bar bg-danger"
+                role="progressbar"
+                style="width: 15%"
+                aria-valuenow="15"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📊 Analytics Charts Row -->
+      <div class="row g-4 mb-5">
+        <!-- Chart 1: Stock Distribution Pie Chart -->
+        <div class="col-lg-4">
+          <div
+            class="card border-0 shadow-sm rounded-4 h-100"
+            style="border: 1px solid #f1f5f9 !important"
+          >
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+              <h6
+                class="fw-bold text-dark mb-1 d-flex align-items-center gap-2"
+              >
+                <i class="bi bi-pie-chart-fill text-primary"></i> Stock
+                Distribution
+              </h6>
+              <p class="text-muted small mb-0">Current inventory breakdown</p>
+            </div>
+            <div class="card-body px-4 pb-4 pt-2">
+              <div style="height: 220px">
+                <canvas id="stockDistributionChart"></canvas>
+              </div>
+              <div class="d-flex justify-content-center gap-4 mt-3">
+                <div class="d-flex align-items-center gap-2">
+                  <span
+                    class="badge rounded-pill px-2"
+                    style="background: #10b981; width: 12px; height: 12px"
+                  ></span>
+                  <small class="fw-medium text-muted">Healthy</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span
+                    class="badge rounded-pill px-2"
+                    style="background: #f59e0b; width: 12px; height: 12px"
+                  ></span>
+                  <small class="fw-medium text-muted">Low Stock</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span
+                    class="badge rounded-pill px-2"
+                    style="background: #ef4444; width: 12px; height: 12px"
+                  ></span>
+                  <small class="fw-medium text-muted">Out of Stock</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 2: Category Distribution Donut Chart -->
+        <div class="col-lg-4">
+          <div
+            class="card border-0 shadow-sm rounded-4 h-100"
+            style="border: 1px solid #f1f5f9 !important"
+          >
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+              <h6
+                class="fw-bold text-dark mb-1 d-flex align-items-center gap-2"
+              >
+                <i class="bi bi-diagram-3-fill text-success"></i> Products by
+                Category
+              </h6>
+              <p class="text-muted small mb-0">Catalog organization</p>
+            </div>
+            <div class="card-body px-4 pb-4 pt-2">
+              <div style="height: 220px">
+                <canvas id="categoryChart"></canvas>
+              </div>
+              <div class="text-center mt-3">
+                <small class="text-muted fw-medium">
+                  <span th:text="${totalCategories}">0</span> categories ·
+                  <span th:text="${totalProducts}">0</span> total products
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 3: Stock Movement Trend Line Chart -->
+        <div class="col-lg-4">
+          <div
+            class="card border-0 shadow-sm rounded-4 h-100"
+            style="border: 1px solid #f1f5f9 !important"
+          >
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+              <h6
+                class="fw-bold text-dark mb-1 d-flex align-items-center gap-2"
+              >
+                <i class="bi bi-graph-up text-info"></i> Movement Trend
+              </h6>
+              <p class="text-muted small mb-0">Last 7 days activity</p>
+            </div>
+            <div class="card-body px-4 pb-4 pt-2">
+              <div style="height: 220px">
+                <canvas id="movementTrendChart"></canvas>
+              </div>
+              <div class="d-flex justify-content-center gap-4 mt-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span
+                    class="badge rounded-pill px-2"
+                    style="background: #3b82f6; width: 12px; height: 12px"
+                  ></span>
+                  <small class="fw-medium text-muted">Stock In</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span
+                    class="badge rounded-pill px-2"
+                    style="background: #64748b; width: 12px; height: 12px"
+                  ></span>
+                  <small class="fw-medium text-muted">Stock Out</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📊 Enhanced Tables Row -->
+      <div class="row g-4 mb-5">
+        <!-- Low Stock Alerts Table -->
+        <div class="col-lg-6">
+          <div
+            class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden"
+            style="
+              border: 1px solid #f1f5f9 !important;
+              transition: all 0.2s ease;
+            "
+          >
+            <div
+              class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <h5
+                  class="fw-bold mb-1 text-dark d-flex align-items-center gap-2"
+                >
+                  <i class="bi bi-lightning-charge text-warning fs-5"></i> Low
+                  Stock Alerts
+                </h5>
+                <p class="text-muted small mb-0 fw-medium">
+                  Products that need immediate restocking
+                </p>
+              </div>
+              <div class="d-flex gap-2">
+                <a
+                  th:href="@{/transactions/new}"
+                  class="btn btn-primary btn-sm px-3 rounded-pill fw-semibold d-flex align-items-center gap-1 shadow-sm"
+                >
+                  <i class="bi bi-plus-lg"></i>Add Stock
                 </a>
-            </div>
-            <div class="col-md-4">
-                <a th:href="@{/suppliers}" class="action-card">
-                    <div class="action-icon" style="background: #eff6ff; color: #3b82f6;"><i
-                            class="bi bi-person-plus"></i></div>
-                    <h4 class="action-title">Suppliers</h4>
-                    <p class="action-desc">Manage sourcing partners</p>
+                <a
+                  th:href="@{/products}"
+                  class="btn btn-outline-secondary btn-sm rounded-pill fw-semibold d-flex align-items-center gap-1"
+                >
+                  View All <i class="bi bi-arrow-right"></i>
                 </a>
+              </div>
             </div>
-            <div class="col-md-4">
-                <a th:href="@{/transactions/new}" class="action-card">
-                    <div class="action-icon" style="background: #eff6ff; color: #3b82f6;"><i class="bi bi-printer"></i>
-                    </div>
-                    <h4 class="action-title">Stock Movement</h4>
-                    <p class="action-desc">Record inbound or outbound stock</p>
-                </a>
+            <div class="card-body px-4 pb-4 pt-0">
+              <table
+                class="table table-custom mb-0 w-100 align-middle"
+                th:if="${lowStockItems != null && !lowStockItems.isEmpty()}"
+              >
+                <thead class="text-muted small text-uppercase fw-semibold">
+                  <tr>
+                    <th style="width: 45%">Product</th>
+                    <th style="width: 30%">Stock Level</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="p : ${lowStockItems}" class="border-bottom">
+                    <td>
+                      <div class="product-cell d-flex align-items-center gap-3">
+                        <div
+                          class="product-icon-box rounded-3 d-flex align-items-center justify-content-center shadow-sm"
+                          style="
+                            width: 44px;
+                            height: 44px;
+                            background: #f8fafc;
+                            color: #475569;
+                          "
+                        >
+                          <i class="bi bi-smartwatch fs-5"></i>
+                        </div>
+                        <div>
+                          <div class="fw-bold text-dark" th:text="${p.name}">
+                            Product Name
+                          </div>
+                          <div
+                            class="text-muted small fw-medium"
+                            th:text="'SKU: ' + ${p.sku}"
+                          >
+                            SKU: 123
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="fw-bold d-flex align-items-center gap-2"
+                        th:classappend="${p.stockQuantity == 0 ? 'text-danger' : 'text-dark'}"
+                      >
+                        <span th:text="${p.stockQuantity} + ' Units'"
+                          >0 Units</span
+                        >
+                        <span
+                          class="badge rounded-pill"
+                          th:classappend="${p.stockQuantity == 0 ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning'}"
+                          th:text="${p.stockQuantity == 0 ? 'Empty' : 'Low'}"
+                          >Low</span
+                        >
+                      </div>
+                      <div
+                        class="progress mt-2"
+                        style="
+                          height: 6px;
+                          border-radius: 6px;
+                          background: #f1f5f9;
+                        "
+                        th:if="${p.stockQuantity > 0}"
+                      >
+                        <div
+                          class="progress-bar rounded-pill"
+                          role="progressbar"
+                          th:style="'width: ' + (${p.stockQuantity} * 10) + '%; background: linear-gradient(to right, #fbbf24, #f59e0b);'"
+                        ></div>
+                      </div>
+                      <div
+                        class="text-danger small fw-bold mt-1 d-flex align-items-center gap-1"
+                        th:if="${p.stockQuantity == 0}"
+                      >
+                        <i class="bi bi-exclamation-diamond-fill"></i> Out of
+                        Stock
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <a
+                        th:href="@{/transactions/new}"
+                        class="btn btn-outline-primary btn-sm px-3 fw-semibold rounded-pill"
+                      >
+                        <i class="bi bi-arrow-clockwise me-1"></i>Restock
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div
+                class="text-center py-5 text-muted"
+                th:if="${lowStockItems == null || lowStockItems.isEmpty()}"
+              >
+                <div
+                  class="mb-3 bg-success bg-opacity-10 rounded-circle d-inline-flex p-3"
+                >
+                  <i class="bi bi-check-circle fs-1 text-success"></i>
+                </div>
+                <p class="fw-semibold mb-1">All stock levels are healthy!</p>
+                <p class="small">No low-stock alerts at the moment.</p>
+              </div>
             </div>
+          </div>
         </div>
+
+        <!-- Recent Transactions Table -->
+        <div class="col-lg-6">
+          <div
+            class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden"
+            style="border: 1px solid #f1f5f9 !important"
+          >
+            <div
+              class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <h5
+                  class="fw-bold mb-1 text-dark d-flex align-items-center gap-2"
+                >
+                  <i class="bi bi-activity text-primary fs-5"></i> Recent
+                  Transactions
+                </h5>
+                <p class="text-muted small mb-0 fw-medium">
+                  Latest stock movements recorded
+                </p>
+              </div>
+              <a
+                th:href="@{/transactions}"
+                class="btn btn-sm btn-outline-secondary rounded-pill d-flex align-items-center gap-1"
+              >
+                <i class="bi bi-funnel"></i> Filter
+              </a>
+            </div>
+            <div class="card-body px-4 pb-4 pt-0">
+              <table
+                class="table table-custom mb-0 w-100 align-middle"
+                th:if="${recentTx != null && !recentTx.isEmpty()}"
+              >
+                <thead class="text-muted small text-uppercase fw-semibold">
+                  <tr>
+                    <th style="width: 50px"></th>
+                    <th>Movement</th>
+                    <th class="text-end">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="tx : ${recentTx}" class="border-bottom">
+                    <td>
+                      <div
+                        class="rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px"
+                        th:classappend="${tx.type.name() == 'STOCK_IN' ? 'bg-primary bg-opacity-10 text-primary' : 'bg-secondary bg-opacity-10 text-secondary'}"
+                      >
+                        <i
+                          class="bi fs-5"
+                          th:classappend="${tx.type.name() == 'STOCK_IN' ? 'bi-box-arrow-in-down' : 'bi-box-arrow-up'}"
+                        ></i>
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="fw-bold text-dark"
+                        th:text="${tx.type.name() == 'STOCK_IN' ? 'Stock Inbound' : 'Stock Outbound'}"
+                      >
+                        Action
+                      </div>
+                      <div
+                        class="text-muted small fw-medium"
+                        th:text="${tx.product?.name}"
+                      >
+                        Product Name
+                      </div>
+                      <div
+                        class="badge rounded-pill mt-1"
+                        th:classappend="${tx.type.name() == 'STOCK_IN' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}"
+                        th:text="${tx.type.name() == 'STOCK_IN' ? '+' + tx.quantity : '-' + tx.quantity}"
+                      >
+                        Qty: +50
+                      </div>
+                    </td>
+                    <td
+                      class="text-end text-muted small fw-medium"
+                      th:text="${#temporals.format(tx.transactionDate,'MMM d, HH:mm')}"
+                    >
+                      2m ago
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div
+                class="text-center py-5 text-muted"
+                th:if="${recentTx == null || recentTx.isEmpty()}"
+              >
+                <div
+                  class="mb-3 bg-secondary bg-opacity-10 rounded-circle d-inline-flex p-3"
+                >
+                  <i class="bi bi-clock-history fs-1 text-secondary"></i>
+                </div>
+                <p class="fw-semibold mb-1">No transactions yet.</p>
+                <p class="small">Stock movements will appear here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⚡ Enhanced Action Cards Row -->
+      <div class="row g-4 mb-3">
+        <div class="col-md-4">
+          <a
+            th:href="@{/products}"
+            class="action-card enhanced-action rounded-4 p-4 d-flex align-items-center gap-4 text-decoration-none border-0 shadow-sm bg-white"
+          >
+            <div
+              class="action-icon rounded-3 d-flex align-items-center justify-content-center"
+              style="
+                background: linear-gradient(135deg, #eff6ff, #dbeafe);
+                color: #2563eb;
+                width: 56px;
+                height: 56px;
+              "
+            >
+              <i class="bi bi-upc-scan fs-3"></i>
+            </div>
+            <div>
+              <h4 class="action-title fw-bold mb-1 text-dark">View Products</h4>
+              <p class="action-desc text-muted small mb-0 fw-medium">
+                Quick stock check or update details
+              </p>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted fs-5"></i>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a
+            th:href="@{/suppliers}"
+            class="action-card enhanced-action rounded-4 p-4 d-flex align-items-center gap-4 text-decoration-none border-0 shadow-sm bg-white"
+          >
+            <div
+              class="action-icon rounded-3 d-flex align-items-center justify-content-center"
+              style="
+                background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+                color: #0284c7;
+                width: 56px;
+                height: 56px;
+              "
+            >
+              <i class="bi bi-person-plus fs-3"></i>
+            </div>
+            <div>
+              <h4 class="action-title fw-bold mb-1 text-dark">Suppliers</h4>
+              <p class="action-desc text-muted small mb-0 fw-medium">
+                Manage sourcing partners
+              </p>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted fs-5"></i>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a
+            th:href="@{/transactions/new}"
+            class="action-card enhanced-action rounded-4 p-4 d-flex align-items-center gap-4 text-decoration-none border-0 shadow-sm bg-white"
+          >
+            <div
+              class="action-icon rounded-3 d-flex align-items-center justify-content-center"
+              style="
+                background: linear-gradient(135deg, #fef9c3, #fef08a);
+                color: #a16207;
+                width: 56px;
+                height: 56px;
+              "
+            >
+              <i class="bi bi-printer fs-3"></i>
+            </div>
+            <div>
+              <h4 class="action-title fw-bold mb-1 text-dark">
+                Stock Movement
+              </h4>
+              <p class="action-desc text-muted small mb-0 fw-medium">
+                Record inbound or outbound stock
+              </p>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted fs-5"></i>
+          </a>
+        </div>
+      </div>
     </div>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script th:src="@{/js/main.js}"></script>
-</body>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get Thymeleaf values (with fallbacks for testing)
+        const totalProducts = parseInt("[[${totalProducts}]]" || "0") || 28;
+        const lowStockCount = parseInt("[[${lowStockCount}]]" || "0") || 5;
+        const outOfStockCount = parseInt("[[${outOfStockCount}]]" || "0") || 3;
+        const totalCategories = parseInt("[[${totalCategories}]]" || "0") || 6;
+
+        // Calculate healthy stock count
+        const healthyStock = Math.max(
+          0,
+          totalProducts - lowStockCount - outOfStockCount,
+        );
+
+        // ========== Chart 1: Stock Distribution Pie Chart ==========
+        const stockCtx = document.getElementById("stockDistributionChart");
+        if (stockCtx) {
+          new Chart(stockCtx, {
+            type: "doughnut",
+            data: {
+              labels: ["Healthy Stock", "Low Stock", "Out of Stock"],
+              datasets: [
+                {
+                  data: [healthyStock, lowStockCount, outOfStockCount],
+                  backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
+                  borderColor: ["#059669", "#d97706", "#dc2626"],
+                  borderWidth: 2,
+                  hoverBorderWidth: 3,
+                  hoverBorderColor: "#ffffff",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  backgroundColor: "#1e293b",
+                  titleColor: "#f8fafc",
+                  bodyColor: "#cbd5e1",
+                  padding: 12,
+                  cornerRadius: 8,
+                  callbacks: {
+                    label: function (context) {
+                      const total = context.dataset.data.reduce(
+                        (a, b) => a + b,
+                        0,
+                      );
+                      const percentage = (
+                        (context.parsed / total) *
+                        100
+                      ).toFixed(1);
+                      return (
+                        context.label +
+                        ": " +
+                        context.parsed +
+                        " (" +
+                        percentage +
+                        "%)"
+                      );
+                    },
+                  },
+                },
+              },
+              cutout: "65%",
+              animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1500,
+                easing: "easeInOutQuart",
+              },
+            },
+          });
+        }
+
+        // ========== Chart 2: Category Distribution Donut Chart ==========
+        const categoryCtx = document.getElementById("categoryChart");
+        if (categoryCtx) {
+          // Sample category data - in production, pass from backend via Thymeleaf
+          const categoryData = {
+            labels: [
+              "Electronics",
+              "Clothing",
+              "Food & Beverages",
+              "Office Supplies",
+              "Accessories",
+              "Other",
+            ],
+            datasets: [
+              {
+                data: [8, 5, 6, 4, 3, 2],
+                backgroundColor: [
+                  "#6366f1",
+                  "#8b5cf6",
+                  "#a855f7",
+                  "#d946ef",
+                  "#ec4899",
+                  "#f43f5e",
+                ],
+                borderColor: "#ffffff",
+                borderWidth: 2,
+                hoverBorderWidth: 3,
+              },
+            ],
+          };
+
+          new Chart(categoryCtx, {
+            type: "pie",
+            data: categoryData,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  backgroundColor: "#1e293b",
+                  titleColor: "#f8fafc",
+                  bodyColor: "#cbd5e1",
+                  padding: 12,
+                  cornerRadius: 8,
+                  callbacks: {
+                    label: function (context) {
+                      const total = context.dataset.data.reduce(
+                        (a, b) => a + b,
+                        0,
+                      );
+                      const percentage = (
+                        (context.parsed / total) *
+                        100
+                      ).toFixed(1);
+                      return (
+                        context.label +
+                        ": " +
+                        context.parsed +
+                        " products (" +
+                        percentage +
+                        "%)"
+                      );
+                    },
+                  },
+                },
+              },
+              animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1500,
+                easing: "easeInOutQuart",
+              },
+            },
+          });
+        }
+
+        // ========== Chart 3: Movement Trend Line Chart ==========
+        const movementCtx = document.getElementById("movementTrendChart");
+        if (movementCtx) {
+          // Sample weekly data - in production, pass from backend via Thymeleaf
+          const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+          const stockInData = [45, 52, 38, 60, 55, 30, 42];
+          const stockOutData = [28, 35, 42, 30, 48, 25, 33];
+
+          new Chart(movementCtx, {
+            type: "line",
+            data: {
+              labels: days,
+              datasets: [
+                {
+                  label: "Stock In",
+                  data: stockInData,
+                  borderColor: "#3b82f6",
+                  backgroundColor: "rgba(59, 130, 246, 0.1)",
+                  borderWidth: 2.5,
+                  pointBackgroundColor: "#3b82f6",
+                  pointBorderColor: "#ffffff",
+                  pointBorderWidth: 2,
+                  pointRadius: 5,
+                  pointHoverRadius: 7,
+                  tension: 0.4,
+                  fill: true,
+                },
+                {
+                  label: "Stock Out",
+                  data: stockOutData,
+                  borderColor: "#64748b",
+                  backgroundColor: "rgba(100, 116, 139, 0.05)",
+                  borderWidth: 2.5,
+                  pointBackgroundColor: "#64748b",
+                  pointBorderColor: "#ffffff",
+                  pointBorderWidth: 2,
+                  pointRadius: 5,
+                  pointHoverRadius: 7,
+                  tension: 0.4,
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  backgroundColor: "#1e293b",
+                  titleColor: "#f8fafc",
+                  bodyColor: "#cbd5e1",
+                  padding: 12,
+                  cornerRadius: 8,
+                  mode: "index",
+                  intersect: false,
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  grid: {
+                    color: "#f1f5f9",
+                    drawBorder: false,
+                  },
+                  ticks: {
+                    color: "#94a3b8",
+                    font: {
+                      size: 11,
+                      weight: "500",
+                    },
+                    stepSize: 20,
+                    callback: function (value) {
+                      return value + " units";
+                    },
+                  },
+                },
+                x: {
+                  grid: {
+                    display: false,
+                    drawBorder: false,
+                  },
+                  ticks: {
+                    color: "#94a3b8",
+                    font: {
+                      size: 11,
+                      weight: "500",
+                    },
+                  },
+                },
+              },
+              interaction: {
+                mode: "index",
+                intersect: false,
+              },
+              animation: {
+                duration: 1500,
+                easing: "easeInOutQuart",
+              },
+            },
+          });
+        }
+      });
+    </script>
+
+    <style>
+      body {
+        background-color: #f9fafb;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      .dashboard-title {
+        font-weight: 800;
+        color: #0f172a;
+      }
+      .dashboard-subtitle {
+        font-size: 1rem;
+        color: #475569;
+      }
+      .enhanced-card,
+      .analytics-card {
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .enhanced-card:hover,
+      .analytics-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08) !important;
+      }
+      .enhanced-action {
+        transition: all 0.25s ease;
+        border: 1px solid #f1f5f9;
+      }
+      .enhanced-action:hover {
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.08);
+      }
+      .icon-circle {
+        transition: background 0.2s;
+      }
+      .table-custom th {
+        font-weight: 600;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+      }
+      .table-custom td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+      }
+      .alert-card {
+        backdrop-filter: blur(2px);
+      }
+      .btn {
+        letter-spacing: 0.3px;
+      }
+      .progress {
+        background-color: #f1f5f9;
+        border-radius: 10px;
+      }
+      .badge {
+        font-weight: 500;
+      }
+    </style>
+  </body>
 </html>
