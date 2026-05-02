@@ -43,6 +43,11 @@ public class StockTransactionService {
         return transactionRepository.findTop10Recent();
     }
 
+    // Return all transactions between two dates (used for dashboard trend chart).
+    public List<StockTransaction> getTransactionsByDateRange(LocalDateTime start, LocalDateTime end) {
+        return transactionRepository.findByDateBetween(start, end);
+    }
+
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Return all transactions for a specific product.
     public List<StockTransaction> getTransactionsByProduct(Long productId) {

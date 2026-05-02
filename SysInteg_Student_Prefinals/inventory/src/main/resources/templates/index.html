@@ -727,15 +727,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script th:src="@{/js/main.js}"></script>
 
+    <!-- Real data injected by Thymeleaf -->
+    <script th:inline="javascript">
+      const categoryLabels = [[${categoryLabels}]];
+      const categoryCounts = [[${categoryCounts}]];
+      const trendLabels    = [[${trendLabels}]];
+      const trendIn        = [[${trendIn}]];
+      const trendOut       = [[${trendOut}]];
+    </script>
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Get Thymeleaf values (with fallbacks for testing)
-        const totalProducts = parseInt("[[${totalProducts}]]" || "0") || 28;
-        const lowStockCount = parseInt("[[${lowStockCount}]]" || "0") || 5;
-        const outOfStockCount = parseInt("[[${outOfStockCount}]]" || "0") || 3;
-        const totalCategories = parseInt("[[${totalCategories}]]" || "0") || 6;
+        const totalProducts   = parseInt("[[${totalProducts}]]")   || 0;
+        const lowStockCount   = parseInt("[[${lowStockCount}]]")   || 0;
+        const outOfStockCount = parseInt("[[${outOfStockCount}]]") || 0;
 
-        // Calculate healthy stock count
         const healthyStock = Math.max(
           0,
           totalProducts - lowStockCount - outOfStockCount,
@@ -808,37 +814,23 @@
         // ========== Chart 2: Category Distribution Donut Chart ==========
         const categoryCtx = document.getElementById("categoryChart");
         if (categoryCtx) {
-          // Sample category data - in production, pass from backend via Thymeleaf
-          const categoryData = {
-            labels: [
-              "Electronics",
-              "Clothing",
-              "Food & Beverages",
-              "Office Supplies",
-              "Accessories",
-              "Other",
-            ],
-            datasets: [
-              {
-                data: [8, 5, 6, 4, 3, 2],
-                backgroundColor: [
-                  "#6366f1",
-                  "#8b5cf6",
-                  "#a855f7",
-                  "#d946ef",
-                  "#ec4899",
-                  "#f43f5e",
-                ],
-                borderColor: "#ffffff",
-                borderWidth: 2,
-                hoverBorderWidth: 3,
-              },
-            ],
-          };
+          const categoryPalette = [
+            "#6366f1","#8b5cf6","#a855f7","#d946ef","#ec4899",
+            "#f43f5e","#3b82f6","#10b981","#f59e0b","#ef4444",
+          ];
 
           new Chart(categoryCtx, {
             type: "pie",
-            data: categoryData,
+            data: {
+              labels: categoryLabels,
+              datasets: [{
+                data: categoryCounts,
+                backgroundColor: categoryPalette.slice(0, categoryLabels.length),
+                borderColor: "#ffffff",
+                borderWidth: 2,
+                hoverBorderWidth: 3,
+              }],
+            },
             options: {
               responsive: true,
               maintainAspectRatio: false,
@@ -887,19 +879,14 @@
         // ========== Chart 3: Movement Trend Line Chart ==========
         const movementCtx = document.getElementById("movementTrendChart");
         if (movementCtx) {
-          // Sample weekly data - in production, pass from backend via Thymeleaf
-          const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-          const stockInData = [45, 52, 38, 60, 55, 30, 42];
-          const stockOutData = [28, 35, 42, 30, 48, 25, 33];
-
           new Chart(movementCtx, {
             type: "line",
             data: {
-              labels: days,
+              labels: trendLabels,
               datasets: [
                 {
                   label: "Stock In",
-                  data: stockInData,
+                  data: trendIn,
                   borderColor: "#3b82f6",
                   backgroundColor: "rgba(59, 130, 246, 0.1)",
                   borderWidth: 2.5,
@@ -913,7 +900,7 @@
                 },
                 {
                   label: "Stock Out",
-                  data: stockOutData,
+                  data: trendOut,
                   borderColor: "#64748b",
                   backgroundColor: "rgba(100, 116, 139, 0.05)",
                   borderWidth: 2.5,
