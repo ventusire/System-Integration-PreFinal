@@ -73,7 +73,7 @@ public class SupplierController {
     }
 
     // ── TODO 4  ──────────────────────────────────────────────────────────────
-    // Delete supplier, redirect with flash message.
+    // Delete supplier, redirect with flash message. kim
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
         supplierService.deleteSupplier(id);
