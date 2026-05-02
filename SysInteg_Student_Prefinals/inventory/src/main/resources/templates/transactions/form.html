@@ -14,7 +14,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Product <span class="text-danger">*</span></label>
-                    <select id="productSelect" class="form-select">
+                    <select id="productSelect" class="form-select" required>
                         <option value="">-- Select Product --</option>
                         <option th:each="p : ${products}" th:value="${p.id}"
                             th:text="${p.name} + ' (' + ${p.sku} + ') — Stock: ' + ${p.stockQuantity}">Product</option>
@@ -24,7 +24,7 @@
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
                         <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                        <input type="number" id="qtyInput" class="form-control" min="1" value="1" />
+                        <input type="number" id="qtyInput" class="form-control" min="1" value="1" required />
                     </div>
                     <div class="col-md-8">
                         <label class="form-label">Reason <span class="text-muted small">(optional)</span></label>

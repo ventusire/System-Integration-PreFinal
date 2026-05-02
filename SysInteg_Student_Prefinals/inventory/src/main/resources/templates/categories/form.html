@@ -72,9 +72,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        const nameVal = form.querySelector('input[name="name"]').value.trim();
-        if (!nameVal) {
-            Swal.fire('Validation Error', 'Category name is required.', 'error');
+        if (!form.checkValidity()) {
+            form.reportValidity();
             return;
         }
         const isEdit = form.querySelector('input[name="id"]').value !== '';

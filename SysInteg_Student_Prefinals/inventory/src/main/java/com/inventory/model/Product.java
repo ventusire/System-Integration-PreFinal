@@ -38,7 +38,9 @@ public class Product {
     private Supplier supplier;
 
     // Used for form binding (dropdowns send IDs, not objects)
+    @NotNull(message = "Category is required")
     private Long categoryId;
+    @NotNull(message = "Supplier is required")
     private Long supplierId;
 
     public boolean isLowStock() {

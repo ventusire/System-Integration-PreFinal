@@ -5,9 +5,12 @@ public class Supplier {
     private Long id;
     @NotBlank(message = "Supplier name is required")
     private String name;
+    @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
+    @NotBlank(message = "Phone number is required")
     private String phone;
+    @NotBlank(message = "Address is required")
     private String address;
     public Long getId() { return id; }
     public String getName() { return name; }

@@ -28,6 +28,7 @@
                   th:field="*{name}"
                   class="form-control"
                   placeholder="e.g. Wireless Mouse"
+                  required
                 />
                 <div
                   class="text-danger small"
@@ -44,6 +45,7 @@
                   th:field="*{sku}"
                   class="form-control"
                   placeholder="e.g. ELEC-001"
+                  required
                 />
                 <div
                   class="text-danger small"
@@ -71,6 +73,7 @@
                   class="form-control"
                   step="0.01"
                   min="0.01"
+                  required
                 />
                 <div
                   class="text-danger small"
@@ -87,6 +90,7 @@
                   th:field="*{stockQuantity}"
                   class="form-control"
                   min="0"
+                  required
                 />
                 <div
                   class="text-danger small"
@@ -108,7 +112,7 @@
             <div class="row g-3 mb-4">
               <div class="col-md-6">
                 <label class="form-label">Category</label>
-                <select th:field="*{categoryId}" class="form-select">
+                <select th:field="*{categoryId}" class="form-select" required>
                   <option value="">-- Select Category --</option>
                   <option
                     th:each="c : ${categories}"
@@ -121,7 +125,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Supplier</label>
-                <select th:field="*{supplierId}" class="form-select">
+                <select th:field="*{supplierId}" class="form-select" required>
                   <option value="">-- Select Supplier --</option>
                   <option
                     th:each="s : ${suppliers}"
@@ -198,6 +202,10 @@
 
         form.addEventListener("submit", function (e) {
           e.preventDefault();
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
           Swal.fire({
             title: "Save Product?",
             text: "Are you sure you want to save this product?",
