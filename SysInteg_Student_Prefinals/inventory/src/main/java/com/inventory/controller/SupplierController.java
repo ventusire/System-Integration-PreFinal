@@ -67,9 +67,9 @@ public class SupplierController {
             return "suppliers/form";
         }
         supplierService.saveSupplier(supplier);
-        flash.addFlashAttribute("succes","Supplier saved successfully");
+        flash.addFlashAttribute("success","Supplier saved successfully");
 
-        return "redirected:/suppliers";
+        return "redirect:/suppliers";
     }
 
     // ── TODO 4  ──────────────────────────────────────────────────────────────

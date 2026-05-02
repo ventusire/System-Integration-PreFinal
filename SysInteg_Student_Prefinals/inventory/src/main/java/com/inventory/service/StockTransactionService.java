@@ -50,12 +50,16 @@ import java.util.List;
 @Service
 public class StockTransactionService {
 
+    // Repositories are the data-access layer. This service uses them to read
+    // transaction rows, load products, update product stock, and save audit logs.
     @Autowired private StockTransactionRepository transactionRepository;
     @Autowired private ProductRepository productRepository;
 
     // ── EXAMPLE ─────────────────────────────────────────────────────────────
     // Returns all transactions, newest first.
     public List<StockTransaction> getAllTransactions() {
+        // This is a simple pass-through method: the repository already knows
+        // how to query every stock transaction from the database.
         return transactionRepository.findAll();
     }
 
@@ -65,6 +69,8 @@ public class StockTransactionService {
     // 500 error in the original stack trace. Now delegates to the repository's
     // findTop10Recent() so the dashboard's recent-transactions panel renders.
     public List<StockTransaction> getRecentTransactions() {
+        // Used by HomeController for the dashboard preview, so it asks only for
+        // the latest few rows instead of loading the full transaction history.
         return transactionRepository.findTop10Recent();
     }
 
@@ -98,6 +104,8 @@ public class StockTransactionService {
      *      quantity, reason, transactionDate=now), and save it.
      *   5. Return the saved transaction.
      */
+    // @Transactional keeps the stock update and transaction log as one unit of
+    // work. If saving the STOCK_IN record fails, the stock count update rolls back.
     @Transactional
     public StockTransaction addStock(Long productId, int quantity, String reason) {
         // WHAT: This method increases a product's stock by `quantity` and writes
@@ -156,6 +164,8 @@ public class StockTransactionService {
      *   5. Create and save a StockTransaction (type = STOCK_OUT).
      *   6. Return the saved transaction.
      */
+    // @Transactional is important here too: the product quantity should not be
+    // reduced unless the matching STOCK_OUT audit record is saved successfully.
     @Transactional
     public StockTransaction removeStock(Long productId, int quantity, String reason) {
         // WHAT: This method decreases a product's stock by `quantity` and writes

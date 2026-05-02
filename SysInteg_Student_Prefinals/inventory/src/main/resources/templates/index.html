@@ -4,132 +4,154 @@
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<div class="hero-bar">
-    <div class="container py-5">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-7">
-                <p class="hero-eyebrow"><i class="bi bi-database me-2"></i>MySQL · Spring Boot · JDBC</p>
-                <h1 class="hero-title">Inventory<br/><span class="hero-accent">Management System</span></h1>
-                <p class="hero-sub">Track products, manage stock levels, record movements, and monitor low-stock alerts — all in one place.</p>
-                <div class="mt-4 d-flex flex-wrap gap-3">
-                    <a th:href="@{/products}" class="btn btn-primary btn-lg px-4">
-                        <i class="bi bi-box-seam me-2"></i>View Products
-                    </a>
-                    <a th:href="@{/transactions/new}" class="btn btn-outline-light btn-lg px-4">
-                        <i class="bi bi-arrow-left-right me-2"></i>Stock Movement
-                    </a>
+<main class="dashboard-page">
+    <section class="hero-banner">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <h1 class="hero-title">Inventory<br/>Management System</h1>
+                    <div class="tech-stack" aria-label="Technology stack">
+                        <span><svg class="ui-icon database-icon"><use href="#icon-database"></use></svg>MySQL</span>
+                        <span><svg class="ui-icon spring-icon"><use href="#icon-spring"></use></svg>Spring Boot</span>
+                        <span><svg class="ui-icon database-icon"><use href="#icon-database"></use></svg>JDBC</span>
+                    </div>
+                    <div class="hero-actions">
+                        <a th:href="@{/products}" class="btn hero-primary-btn">
+                            <svg class="ui-icon"><use href="#icon-cube"></use></svg>
+                            <span>View Products</span>
+                        </a>
+                        <a th:href="@{/transactions/new}" class="btn hero-secondary-btn">
+                            <svg class="ui-icon"><use href="#icon-arrows"></use></svg>
+                            <span>Stock Movement</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-5 d-none d-lg-flex justify-content-end">
-                <div class="hero-glyph"><i class="bi bi-boxes"></i></div>
-            </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<!-- STAT CARDS -->
-<div class="container mt-n4 position-relative" style="z-index:10">
-    <div class="row g-3">
-        <div class="col-6 col-md-4 col-lg-2-4">
-            <div class="kpi-card kpi-blue">
-                <div class="kpi-icon"><i class="bi bi-box-seam"></i></div>
-                <div class="kpi-value" th:text="${totalProducts}">0</div>
-                <div class="kpi-label">Products</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-2-4">
-            <div class="kpi-card kpi-green">
-                <div class="kpi-icon"><i class="bi bi-tags"></i></div>
-                <div class="kpi-value" th:text="${totalCategories}">0</div>
-                <div class="kpi-label">Categories</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-2-4">
-            <div class="kpi-card kpi-purple">
-                <div class="kpi-icon"><i class="bi bi-truck"></i></div>
-                <div class="kpi-value" th:text="${totalSuppliers}">0</div>
-                <div class="kpi-label">Suppliers</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-6 col-lg-2-4">
-            <div class="kpi-card kpi-orange">
-                <div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
-                <div class="kpi-value" th:text="${lowStockCount}">0</div>
-                <div class="kpi-label">Low Stock</div>
-            </div>
-        </div>
-        <div class="col-6 col-md-6 col-lg-2-4">
-            <div class="kpi-card kpi-red">
-                <div class="kpi-icon"><i class="bi bi-x-circle"></i></div>
-                <div class="kpi-value" th:text="${outOfStockCount}">0</div>
-                <div class="kpi-label">Out of Stock</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- TABLES ROW -->
-<div class="container mt-5 pb-5">
-    <div class="row g-4">
-        <!-- Low Stock Alerts -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle text-warning me-2"></i>Low Stock Alerts</h6>
-                    <a th:href="@{/products}" class="btn btn-sm btn-outline-secondary">View All</a>
+    <section class="container dashboard-content">
+        <div class="kpi-grid">
+            <div class="kpi-card kpi-standard kpi-blue">
+                <div class="kpi-icon"><svg class="ui-icon"><use href="#icon-cube"></use></svg></div>
+                <div class="kpi-metric">
+                    <div class="kpi-value" th:text="${totalProducts}">0</div>
+                    <div class="kpi-label">Products</div>
                 </div>
-                <div class="card-body px-4">
-                    <!-- RECENT FIX (commit c293b42): added a null guard. Before, if the controller
-                         failed or returned null, calling .isEmpty() on a null list crashed Thymeleaf.
-                         Now the table only renders when the list is non-null AND non-empty. -->
-                    <table class="table table-sm table-hover mb-0" th:if="${lowStockItems != null && !lowStockItems.isEmpty()}">
-                        <thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Reorder At</th></tr></thead>
+            </div>
+            <div class="kpi-card kpi-standard kpi-green">
+                <div class="kpi-icon"><svg class="ui-icon"><use href="#icon-tag"></use></svg></div>
+                <div class="kpi-metric">
+                    <div class="kpi-value" th:text="${totalCategories}">0</div>
+                    <div class="kpi-label">Categories</div>
+                </div>
+            </div>
+            <div class="kpi-card kpi-standard kpi-purple">
+                <div class="kpi-icon"><svg class="ui-icon"><use href="#icon-truck"></use></svg></div>
+                <div class="kpi-metric">
+                    <div class="kpi-value" th:text="${totalSuppliers}">0</div>
+                    <div class="kpi-label">Suppliers</div>
+                </div>
+            </div>
+            <div class="kpi-card kpi-alert kpi-orange">
+                <div class="kpi-icon"><svg class="ui-icon"><use href="#icon-warning"></use></svg></div>
+                <div class="kpi-metric">
+                    <div class="kpi-value" th:text="${lowStockCount}">0</div>
+                    <div class="kpi-label">Low Stock</div>
+                </div>
+            </div>
+            <div class="kpi-card kpi-alert kpi-red">
+                <div class="kpi-icon"><svg class="ui-icon"><use href="#icon-x-circle"></use></svg></div>
+                <div class="kpi-metric">
+                    <div class="kpi-value" th:text="${outOfStockCount}">0</div>
+                    <div class="kpi-label">Out of Stock</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <section class="dashboard-panel low-stock-panel">
+                <div class="panel-header">
+                    <h2><svg class="ui-icon"><use href="#icon-warning"></use></svg>Low Stock Alerts</h2>
+                    <a th:href="@{/products}">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="dashboard-table low-stock-table" th:if="${lowStockItems != null && !lowStockItems.isEmpty()}">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr th:each="p : ${lowStockItems}">
-                                <td th:text="${p.name}">Name</td>
-                                <td><code th:text="${p.sku}">SKU</code></td>
+                                <td class="item-name" th:text="${p.name}">Product Name</td>
+                                <td><span class="sku-code" th:text="${p.sku}">SKU</span></td>
                                 <td>
-                                    <span th:class="${p.stockQuantity == 0 ? 'badge bg-danger' : 'badge bg-warning text-dark'}"
-                                          th:text="${p.stockQuantity}">0</span>
+                                    <div class="stock-cell">
+                                        <span class="stock-track">
+                                            <span th:class="${p.stockQuantity == 0 ? 'stock-fill stock-empty' : 'stock-fill stock-low'}"
+                                                  th:style="|width: ${p.stockQuantity == 0 ? 4 : (p.stockQuantity < 10 ? p.stockQuantity * 10 : 100)}%|"></span>
+                                        </span>
+                                        <span th:class="${p.stockQuantity == 0 ? 'stock-badge stock-zero' : 'stock-badge stock-warning'}"
+                                              th:text="${p.stockQuantity}">0</span>
+                                    </div>
                                 </td>
-                                <td th:text="${p.reorderLevel}">10</td>
+                                <td>
+                                    <span class="table-action" th:text="${p.stockQuantity == 0 ? 'Reorder' : 'Review'}">Review</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                    <p class="text-muted text-center py-3 mb-0" th:if="${lowStockItems == null || lowStockItems.isEmpty()}">
-                        <i class="bi bi-check-circle text-success me-1"></i>All stock levels are healthy!
-                    </p>
+                    <div class="empty-state" th:if="${lowStockItems == null || lowStockItems.isEmpty()}">
+                        <svg class="ui-icon"><use href="#icon-check"></use></svg>
+                        <span>All stock levels are healthy.</span>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <!-- Recent Transactions -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Recent Transactions</h6>
-                    <a th:href="@{/transactions}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </section>
+
+            <section class="dashboard-panel transactions-panel">
+                <div class="panel-header">
+                    <h2><svg class="ui-icon"><use href="#icon-clock"></use></svg>Recent Transactions</h2>
+                    <a th:href="@{/transactions}">View All</a>
                 </div>
-                <div class="card-body px-4">
-                    <table class="table table-sm table-hover mb-0" th:if="${recentTx != null && !recentTx.isEmpty()}">
-                        <thead><tr><th>Product</th><th>Type</th><th>Qty</th><th>Date</th></tr></thead>
+                <div class="table-responsive">
+                    <table class="dashboard-table transactions-table" th:if="${recentTx != null && !recentTx.isEmpty()}">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Date &amp; Time</th>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr th:each="tx : ${recentTx}">
-                                <td th:text="${tx.product?.name}">Product</td>
+                                <td class="tx-id" th:text="'TXN-' + ${tx.id}">TXN-001</td>
+                                <td class="tx-date" th:text="${#temporals.format(tx.transactionDate,'yyyy-MM-dd h:mm a')}">2024-05-15 10:30 AM</td>
+                                <td class="item-name" th:text="${tx.product?.name}">Wireless Mouse</td>
                                 <td>
-                                    <span th:class="${tx.type.name() == 'STOCK_IN' ? 'badge bg-success' : 'badge bg-danger'}"
-                                          th:text="${tx.type}">IN</span>
+                                    <span th:class="${tx.type.name() == 'STOCK_IN' ? 'type-badge type-in' : 'type-badge type-out'}"
+                                          th:text="${tx.type.name() == 'STOCK_IN' ? 'Stock In' : 'Stock Out'}">Stock In</span>
                                 </td>
-                                <td th:text="${tx.quantity}">0</td>
-                                <td><small th:text="${#temporals.format(tx.transactionDate,'MMM d')}">Date</small></td>
+                                <td class="quantity-value" th:text="${tx.quantity}">20</td>
+                                <td><span class="status-badge">Completed</span></td>
                             </tr>
                         </tbody>
                     </table>
-                    <p class="text-muted text-center py-3 mb-0" th:if="${recentTx == null || recentTx.isEmpty()}">No transactions yet.</p>
+                    <div class="empty-state" th:if="${recentTx == null || recentTx.isEmpty()}">
+                        <svg class="ui-icon"><use href="#icon-clock"></use></svg>
+                        <span>No transactions yet.</span>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
-    </div>
-</div>
+    </section>
+</main>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

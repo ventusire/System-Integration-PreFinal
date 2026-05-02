@@ -174,6 +174,9 @@ public class ProductRepository {
     // query that appends the WHERE clause to BASE_SELECT so the dashboard can list
     // products that have hit or fallen below their reorder threshold.
     public List<Product> findLowStockProducts() {
+        // This keeps the BASE_SELECT joins, then filters products whose current
+        // stock is less than or equal to their reorder level. Ordering by stock
+        // quantity puts the most urgent low-stock items first.
         return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity <= p.reorder_level ORDER BY p.stock_quantity", rowMapper);
     }
 
@@ -183,6 +186,8 @@ public class ProductRepository {
     // query that returns every product whose stock has hit zero, alphabetised by
     // name — used by the dashboard's "out of stock" counter.
     public List<Product> findOutOfStock() {
+        // This filters the product table to only items with zero stock. It still
+        // uses BASE_SELECT so each Product includes its Category and Supplier.
         return jdbcTemplate.query(BASE_SELECT + "WHERE p.stock_quantity = 0 ORDER BY p.name", rowMapper);
     }
 

@@ -31,6 +31,8 @@ import com.inventory.service.SupplierService;
 @Controller
 public class HomeController {
 
+    // Spring injects these services so the controller can collect dashboard data
+    // without directly handling database queries or business rules.
     @Autowired private ProductService productService;
     @Autowired private CategoryService categoryService;
     @Autowired private SupplierService supplierService;
@@ -59,22 +61,30 @@ public class HomeController {
     // all 7 attributes that index.html expects: total counts (products, categories,
     // suppliers), stock summary counts (low stock, out of stock), and the two
     // list previews (recent transactions, low stock items).
+    //
+    // @GetMapping("/") means Spring runs this method when the user opens the
+    // home URL of the inventory system.
     @GetMapping("/")
     public String dashboard(Model model) {
 
-        // total counts
+        // The Model object is a container for values that index.html can display.
+        // Each addAttribute call creates a named value for the Thymeleaf template.
+
+        // These totals are shown as summary cards on the dashboard.
         model.addAttribute("totalProducts", productService.getAllProducts().size());
         model.addAttribute("totalCategories", categoryService.getAllCategories().size());
         model.addAttribute("totalSuppliers", supplierService.getAllSuppliers().size());
 
-        // stock info
+        // These stock counts help the dashboard warn users about inventory issues.
         model.addAttribute("lowStockCount", productService.getLowStockProducts().size());
         model.addAttribute("outOfStockCount", productService.getOutOfStockProducts().size());
 
-        // lists
+        // These lists provide preview sections for recent stock activity and items
+        // that need attention because their stock is already low.
         model.addAttribute("recentTx", transactionService.getRecentTransactions());
         model.addAttribute("lowStockItems", productService.getLowStockProducts());
 
+        // Returning "index" tells Spring to render the index.html view.
         return "index"; // this loads index.html
     }
 }

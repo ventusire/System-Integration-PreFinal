@@ -3,51 +3,93 @@
 <head th:replace="~{fragments/layout :: head('Products')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0"><i class="bi bi-box-seam me-2 text-primary"></i>Products</h4>
-        <a th:href="@{/products/new}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Product</a>
-    </div>
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-    <form th:action="@{/products}" method="get" class="mb-4 d-flex gap-2">
-        <input type="text" name="search" class="form-control" placeholder="Search by name or SKU..." th:value="${search}"/>
-        <button class="btn btn-outline-dark px-4">Search</button>
-        <a th:href="@{/products}" class="btn btn-outline-secondary">Clear</a>
-    </form>
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-header">
-                    <tr><th>SKU</th><th>Name</th><th>Category</th><th>Supplier</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                    <tr th:each="p : ${products}">
-                        <td><code th:text="${p.sku}">SKU</code></td>
-                        <td><a th:href="@{/products/{id}(id=${p.id})}" th:text="${p.name}" class="fw-semibold link-dark text-decoration-none">Name</a></td>
-                        <td><span class="badge bg-light text-dark border" th:text="${p.category?.name}">Cat</span></td>
-                        <td class="text-muted small" th:text="${p.supplier?.name}">Supplier</td>
-                        <td th:text="'₱' + ${#numbers.formatDecimal(p.price,1,2)}">₱0</td>
-                        <td class="fw-semibold" th:text="${p.stockQuantity}">0</td>
-                        <td>
-                            <span th:if="${p.stockQuantity == 0}" class="badge bg-danger">Out of Stock</span>
-                            <span th:if="${p.stockQuantity > 0 and p.isLowStock()}" class="badge bg-warning text-dark">Low Stock</span>
-                            <span th:if="${p.stockQuantity > 0 and !p.isLowStock()}" class="badge bg-success">In Stock</span>
-                        </td>
-                        <td>
-                            <a th:href="@{/products/edit/{id}(id=${p.id})}" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-pencil"></i></a>
-                            <form th:action="@{/products/delete/{id}(id=${p.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete this product?')">
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${products.isEmpty()}">
-                        <td colspan="8" class="text-center text-muted py-5"><i class="bi bi-inbox me-2"></i>No products found.</td>
-                    </tr>
-                </tbody>
-            </table>
+
+<main class="app-page">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title"><svg class="ui-icon"><use href="#icon-cube"></use></svg>Products</h1>
+            <div class="page-actions">
+                <a th:href="@{/products/new}" class="btn page-primary-btn">
+                    <svg class="ui-icon"><use href="#icon-plus"></use></svg>
+                    <span>Add Product</span>
+                </a>
+            </div>
         </div>
+
+        <div th:if="${success != null || message != null}" class="alert alert-success alert-dismissible fade show page-alert" role="alert">
+            <span th:text="${success != null ? success : message}">Product saved successfully.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form th:action="@{/products}" method="get" class="search-panel">
+            <input type="text" name="search" class="form-control" placeholder="Search by name or SKU..." th:value="${search}"/>
+            <button class="btn page-secondary-btn" type="submit">
+                <svg class="ui-icon"><use href="#icon-search"></use></svg>
+                <span>Search</span>
+            </button>
+            <a th:href="@{/products}" class="btn page-secondary-btn">
+                <svg class="ui-icon"><use href="#icon-x"></use></svg>
+                <span>Clear</span>
+            </a>
+        </form>
+
+        <section class="content-panel">
+            <div class="table-responsive">
+                <table class="app-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${products}">
+                            <td><span class="sku-code" th:text="${p.sku}">SKU</span></td>
+                            <td>
+                                <a th:href="@{/products/{id}(id=${p.id})}" th:text="${p.name}" class="row-title text-decoration-none">Name</a>
+                            </td>
+                            <td><span class="app-badge badge-soft" th:text="${p.category?.name}">Category</span></td>
+                            <td class="muted-cell" th:text="${p.supplier?.name}">Supplier</td>
+                            <td>
+                                <span>&#8369;</span><span th:text="${#numbers.formatDecimal(p.price,1,2)}">0.00</span>
+                            </td>
+                            <td class="row-title" th:text="${p.stockQuantity}">0</td>
+                            <td>
+                                <span th:if="${p.stockQuantity == 0}" class="app-badge badge-danger">Out of Stock</span>
+                                <span th:if="${p.stockQuantity > 0 and p.isLowStock()}" class="app-badge badge-warning">Low Stock</span>
+                                <span th:if="${p.stockQuantity > 0 and !p.isLowStock()}" class="app-badge badge-success">In Stock</span>
+                            </td>
+                            <td>
+                                <div class="action-cell">
+                                    <a th:href="@{/products/edit/{id}(id=${p.id})}" class="icon-action edit" aria-label="Edit product">
+                                        <svg class="ui-icon"><use href="#icon-pencil"></use></svg>
+                                    </a>
+                                    <form th:action="@{/products/delete/{id}(id=${p.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete this product?')">
+                                        <button class="icon-action delete" type="submit" aria-label="Delete product">
+                                            <svg class="ui-icon"><use href="#icon-trash"></use></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${products == null || products.isEmpty()}">
+                            <td colspan="8" class="empty-table-cell">
+                                <svg class="ui-icon me-2"><use href="#icon-inbox"></use></svg>No products found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
-</div>
+</main>
+
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/main.js}"></script>
