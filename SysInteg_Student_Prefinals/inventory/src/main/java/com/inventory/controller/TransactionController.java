@@ -9,20 +9,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * ┌─────────────────────────────────────────────────────────────────┐
- * │  GROUP 4 — TransactionController                                │
- * │                                                                 │
- * │  ROUTES                                                         │
- * │    GET  /transactions          → list all transactions          │
- * │    GET  /transactions/new      → stock movement form            │
- * │    POST /transactions/stock-in → add stock to a product         │
- * │    POST /transactions/stock-out→ remove stock from a product    │
- * │                                                                 │
- * │  NOTE: Wrap stock-in and stock-out in try/catch.                │
- * │  The service throws RuntimeException for invalid operations     │
- * │  (e.g. insufficient stock). Use flash.addFlashAttribute to      │
- * │  show the error message in the UI without crashing the app.     │
- * └─────────────────────────────────────────────────────────────────┘
+ * TransactionController - Handles stock movements (add or remove stock)
+ * 
+ * WHAT: This controller manages when products are added or removed from inventory
+ * WHY: We need to track every time stock goes in or out so we know how much we have
+ * HOW: Users submit forms to add/remove stock, and this controller saves those changes
+ * 
+ * ROUTES (web addresses this controller listens to):
+ *   GET  /transactions         - Show list of all stock movements
+ *   GET  /transactions/new     - Show form to add or remove stock
+ *   POST /transactions/stock-in  - Add stock to a product
+ *   POST /transactions/stock-out - Remove stock from a product
+ * 
+ * IMPORTANT: Both stock-in and stock-out use try/catch blocks because:
+ * - The service checks if the operation is valid (e.g., is there enough stock?)
+ * - If something goes wrong, it throws an error
+ * - We catch that error and show it as a message instead of crashing the app
  */
 @Controller
 @RequestMapping("/transactions")
@@ -31,82 +33,99 @@ public class TransactionController {
     @Autowired private StockTransactionService transactionService;
     @Autowired private ProductService productService;
 
-    // ── EXAMPLE ─────────────────────────────────────────────────────────────
-    // GET /transactions — list all transactions.
+    // EXAMPLE METHOD - Display all stock transactions
+    // WHAT: Gets all transactions from database and shows them on a list page
+    // WHY: Users need to see the history of all stock movements
+    // HOW: Calls transactionService to get all transactions, adds them to the page
+    //
+    // CODE EXPLANATION:
+    // model.addAttribute("transactions", transactionService.getAllTransactions())
+    //   → Gets all transactions from database and puts them in the page so HTML can display them
+    // return "transactions/list" → Shows the transactions/list.html page
     @GetMapping
     public String list(Model model) {
         model.addAttribute("transactions", transactionService.getAllTransactions());
         return "transactions/list";
     }
 
-    // ── TODO 1 ──────────────────────────────────────────────────────────────
-    // GET /transactions/new — show the stock movement form.
-    // The form needs all products in the model (for the product dropdown).
+    // TODO 1 - Show form for adding or removing stock
+    // WHAT: Displays a form where users can choose a product and enter quantity
+    // WHY: User needs a form to tell us which product and how much to add/remove
+    // HOW: Gets all products from database and puts them in a dropdown list
+    //
+    // CODE EXPLANATION:
+    // model.addAttribute("products", productService.getAllProducts())
+    //   → Gets all products from database and adds them to the page
+    //   → The HTML form will use these products to create a dropdown menu for user to pick from
+    // return "transactions/form" → Shows the transactions/form.html page with the form
     @GetMapping("/new")
     public String newForm(Model model) {
-        // COMPLETED: Delegate to ProductService to fetch all products from database
-        // and attach them to the Model so the form template can populate the dropdown.
-        // The form will iterate over this list to allow users to select a product.
+        // Get all products and pass them to the form so user can pick one from dropdown
         model.addAttribute("products", productService.getAllProducts());
         return "transactions/form";
     }
 
-    // ── TODO 2 ──────────────────────────────────────────────────────────────
-    // POST /transactions/stock-in
-    // Call transactionService.addStock(productId, quantity, reason).
-    // On success → flash "X units added to stock."
-    // On failure (RuntimeException) → flash the exception message as "error".
-    // Redirect to /transactions either way.
+    // TODO 2 - Add stock to a product
+    // WHAT: Increases the quantity of a product in inventory
+    // WHY: When we receive new products from suppliers, we need to add them to stock
+    // HOW: Validates the operation → saves it to database → shows success/error message
+    //
+    // CODE EXPLANATION:
+    // @RequestParam extracts productId, quantity, and reason from the form submission
+    // try { } → Attempts the operation, if it fails we catch the error
+    // transactionService.addStock(...) → Calls service to add stock to database
+    // flash.addFlashAttribute("message", ...) → Stores success message to show on next page
+    // catch(RuntimeException e) → If service throws an error, we catch it here
+    // flash.addFlashAttribute("error", e.getMessage()) → Shows error message instead of crashing
+    // return "redirect:/transactions" → After saving, go back to transactions list
     @PostMapping("/stock-in")
     public String stockIn(@RequestParam Long productId,
                           @RequestParam int quantity,
                           @RequestParam(required = false) String reason,
                           RedirectAttributes flash) {
         try {
-            // COMPLETED: Attempt to add stock via service. The service handles the business
-            // logic: creates a stock transaction record and updates product quantity.
-            // If product not found or other error occurs, the service throws RuntimeException.
+            // Try to add stock to the product
             transactionService.addStock(productId, quantity, reason);
-            // SUCCESS: Flash a user-friendly message showing the quantity added.
-            // This message will display on the next page via Spring's flash mechanism.
+            // If it worked, show success message
             flash.addFlashAttribute("message", quantity + " units added to stock.");
         } catch (RuntimeException e) {
-            // ERROR HANDLING: Catch any exception from the service (e.g., product not found)
-            // and flash the error message so the user sees what went wrong without crashing.
+            // If something went wrong (e.g., product not found), show the error message
+            // This prevents the app from crashing and tells user what happened
             flash.addFlashAttribute("error", e.getMessage());
         }
-        // REDIRECT: Always return to the transactions list, whether success or failure.
-        // Flash attributes persist across the redirect so messages appear on the next page.
+        // Go back to the transactions list page
         return "redirect:/transactions";
     }
 
-    // ── TODO 3 ──────────────────────────────────────────────────────────────
-    // POST /transactions/stock-out
-    // Same pattern as stock-in but calls transactionService.removeStock().
-    // Remember: removeStock throws if there is insufficient stock — catch it!
+    // TODO 3 - Remove stock from a product
+    // WHAT: Decreases the quantity of a product in inventory
+    // WHY: When products are sold or used, we need to remove them from stock
+    // HOW: Checks if enough stock exists → removes it from database → shows message
+    //      (If not enough stock, shows error instead)
+    //
+    // CODE EXPLANATION:
+    // Same structure as stock-in but calls removeStock instead:
+    // transactionService.removeStock(...) → Service checks: "Is there enough stock to remove?"
+    //   If not enough → throws error → we catch it → show error message
+    //   If enough → removes from database → show success message
+    // The try/catch prevents the app from crashing if there's not enough stock
     @PostMapping("/stock-out")
     public String stockOut(@RequestParam Long productId,
                            @RequestParam int quantity,
                            @RequestParam(required = false) String reason,
                            RedirectAttributes flash) {
         try {
-            // COMPLETED: Attempt to remove stock via service. The service validates that
-            // the product has sufficient stock before creating a stock-out transaction.
-            // If stock is insufficient, the service throws a RuntimeException with a
-            // descriptive message (e.g., "Insufficient stock to remove X units").
+            // Try to remove stock from the product
+            // The service checks if there's enough stock before removing
             transactionService.removeStock(productId, quantity, reason);
-            // SUCCESS: Flash a user-friendly message showing the quantity removed.
-            // This confirms the operation completed without issues.
+            // If it worked, show success message
             flash.addFlashAttribute("message", quantity + " units removed from stock.");
         } catch (RuntimeException e) {
-            // ERROR HANDLING: Catch exceptions from the service. Common cases include:
-            // - Insufficient stock (most common for stock-out)
-            // - Product not found
-            // Flash the error message so the user understands what went wrong.
+            // If something went wrong (e.g., not enough stock), show the error message
+            // This prevents the app from crashing and tells user what the problem is
             flash.addFlashAttribute("error", e.getMessage());
         }
-        // REDIRECT: Always return to the transactions list for consistency.
-        // The flash attributes carry error/success messages across the redirect.
+        // Go back to the transactions list page
         return "redirect:/transactions";
     }
 }
