@@ -21,6 +21,18 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
+        <form th:action="@{/categories}" method="get" class="search-panel">
+            <input type="text" name="search" class="form-control" placeholder="Search by name or description..." th:value="${search}"/>
+            <button class="btn page-secondary-btn" type="submit">
+                <svg class="ui-icon"><use href="#icon-search"></use></svg>
+                <span>Search</span>
+            </button>
+            <a th:href="@{/categories}" class="btn page-secondary-btn">
+                <svg class="ui-icon"><use href="#icon-x"></use></svg>
+                <span>Clear</span>
+            </a>
+        </form>
+
         <div class="entity-grid" th:if="${categories != null && !categories.isEmpty()}">
             <article class="entity-card" th:each="c : ${categories}">
                 <div class="entity-card-body">
@@ -42,7 +54,7 @@
 
         <div class="empty-state-panel" th:if="${categories == null || categories.isEmpty()}">
             <svg class="ui-icon"><use href="#icon-inbox"></use></svg>
-            <span>No categories yet.</span>
+            <span th:text="${search != null && !search.isBlank() ? 'No categories found.' : 'No categories yet.'}">No categories yet.</span>
         </div>
     </div>
 </main>

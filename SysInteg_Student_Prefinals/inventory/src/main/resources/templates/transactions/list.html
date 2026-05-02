@@ -25,6 +25,18 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
+        <form th:action="@{/transactions}" method="get" class="search-panel">
+            <input type="text" name="search" class="form-control" placeholder="Search by product, SKU, type, or reason..." th:value="${search}"/>
+            <button class="btn page-secondary-btn" type="submit">
+                <svg class="ui-icon"><use href="#icon-search"></use></svg>
+                <span>Search</span>
+            </button>
+            <a th:href="@{/transactions}" class="btn page-secondary-btn">
+                <svg class="ui-icon"><use href="#icon-x"></use></svg>
+                <span>Clear</span>
+            </a>
+        </form>
+
         <section class="content-panel">
             <div class="table-responsive">
                 <table class="app-table">
@@ -54,7 +66,8 @@
                         </tr>
                         <tr th:if="${transactions == null || transactions.isEmpty()}">
                             <td colspan="7" class="empty-table-cell">
-                                <svg class="ui-icon me-2"><use href="#icon-clock"></use></svg>No transactions recorded yet.
+                                <svg class="ui-icon me-2"><use href="#icon-clock"></use></svg>
+                                <span th:text="${search != null && !search.isBlank() ? 'No transactions found.' : 'No transactions recorded yet.'}">No transactions recorded yet.</span>
                             </td>
                         </tr>
                     </tbody>

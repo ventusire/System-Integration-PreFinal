@@ -36,8 +36,13 @@ public class TransactionController {
     // ── EXAMPLE ─────────────────────────────────────────────────────────────
     // GET /transactions — list all transactions.
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("transactions", transactionService.getAllTransactions());
+    public String list(Model model, @RequestParam(required = false) String search) {
+        if (search != null && !search.isBlank()) {
+            model.addAttribute("transactions", transactionService.searchTransactions(search));
+            model.addAttribute("search", search);
+        } else {
+            model.addAttribute("transactions", transactionService.getAllTransactions());
+        }
         return "transactions/list";
     }
 

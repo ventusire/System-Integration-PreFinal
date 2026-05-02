@@ -148,10 +148,6 @@
                 </li>
             </ul>
             <div class="navbar-actions">
-                <form class="nav-search" th:action="@{/products}" method="get" role="search">
-                    <svg class="ui-icon"><use href="#icon-search"></use></svg>
-                    <input type="search" name="search" placeholder="Search" aria-label="Search products"/>
-                </form>
                 <a class="btn stock-movement-btn" th:href="@{/transactions/new}">
                     <svg class="ui-icon"><use href="#icon-plus"></use></svg>
                     <span>Stock Movement</span>

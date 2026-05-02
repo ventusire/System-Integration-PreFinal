@@ -35,8 +35,13 @@ public class SupplierController {
 
     // ── EXAMPLE ─────────────────────────────────────────────────────────────
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+    public String list(Model model, @RequestParam(required = false) String search) {
+        if (search != null && !search.isBlank()) {
+            model.addAttribute("suppliers", supplierService.searchSuppliers(search));
+            model.addAttribute("search", search);
+        } else {
+            model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        }
         return "suppliers/list";
     }
 

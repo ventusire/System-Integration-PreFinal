@@ -141,7 +141,12 @@ public class SupplierRepository {
         //       before comparing, so the match ignores upper/lower case differences.
         //       LIKE is a SQL pattern-matching operator — the "%" symbols are wildcards that
         //       match any characters before and after the keyword.
-        String sql = "SELECT id, name, email, phone, address FROM suppliers WHERE LOWER(name) LIKE LOWER(?) ORDER BY name ASC";
+        String sql = "SELECT id, name, email, phone, address FROM suppliers " +
+                "WHERE LOWER(name) LIKE LOWER(?) " +
+                "OR LOWER(email) LIKE LOWER(?) " +
+                "OR LOWER(COALESCE(phone, '')) LIKE LOWER(?) " +
+                "OR LOWER(COALESCE(address, '')) LIKE LOWER(?) " +
+                "ORDER BY name ASC";
 
         // We wrap the keyword with "%" on both sides so it matches anywhere in the name.
         // For example, if keyword is "tech", wildcardKeyword becomes "%tech%",
@@ -150,7 +155,7 @@ public class SupplierRepository {
 
         // query() runs the SQL and uses the rowMapper to convert each matching row into a
         // Supplier object. The result is a List because multiple suppliers can match.
-        return jdbcTemplate.query(sql, rowMapper, wildcardKeyword);
+        return jdbcTemplate.query(sql, rowMapper, wildcardKeyword, wildcardKeyword, wildcardKeyword, wildcardKeyword);
     }
 
     // ── TODO 5 ─done─────────────────────────────────────────────────────────────

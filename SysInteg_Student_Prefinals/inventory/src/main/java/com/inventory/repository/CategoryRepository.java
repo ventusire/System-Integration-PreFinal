@@ -89,9 +89,13 @@ public class CategoryRepository {
     // Find all categories whose name contains the keyword (case-insensitive).
     // Hint: use LOWER(name) LIKE LOWER(?) and wrap keyword with %...%
     public List<Category> searchByKeyword(String keyword) {
-        String sql = "SELECT id, name, description FROM categories WHERE LOWER(name) LIKE LOWER(?)";
+        String sql = "SELECT id, name, description FROM categories " +
+                "WHERE LOWER(name) LIKE LOWER(?) " +
+                "OR LOWER(COALESCE(description, '')) LIKE LOWER(?) " +
+                "ORDER BY name";
         // Wrap keyword with wildcards for partial matching
-        return jdbcTemplate.query(sql, rowMapper, "%" + keyword + "%");
+        String wildcardKeyword = "%" + keyword.trim() + "%";
+        return jdbcTemplate.query(sql, rowMapper, wildcardKeyword, wildcardKeyword);
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────

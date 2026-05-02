@@ -25,6 +25,10 @@ public class SupplierService {
         return supplierRepository.findAll();
     }
 
+    public List<Supplier> searchSuppliers(String keyword) {
+        return supplierRepository.searchByKeyword(keyword);
+    }
+
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Retrieve a single supplier by ID. Returns Optional to safely handle cases
     // where the supplier does not exist, avoiding null pointer exceptions.

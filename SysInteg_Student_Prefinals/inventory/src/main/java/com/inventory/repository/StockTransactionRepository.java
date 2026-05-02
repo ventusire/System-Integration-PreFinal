@@ -94,6 +94,18 @@ public class StockTransactionRepository {
         return jdbcTemplate.query(BASE_SELECT + "ORDER BY t.transaction_date DESC", rowMapper);
     }
 
+    public List<StockTransaction> searchByKeyword(String keyword) {
+        String term = "%" + keyword.trim().toLowerCase() + "%";
+        String sql = BASE_SELECT +
+                "WHERE LOWER(p.name) LIKE ? " +
+                "OR LOWER(p.sku) LIKE ? " +
+                "OR LOWER(t.type) LIKE ? " +
+                "OR LOWER(REPLACE(t.type, '_', ' ')) LIKE ? " +
+                "OR LOWER(COALESCE(t.reason, '')) LIKE ? " +
+                "ORDER BY t.transaction_date DESC";
+        return jdbcTemplate.query(sql, rowMapper, term, term, term, term, term);
+    }
+
    // ── TODO 1 — DONE ───────────────────────────────────────────────────────
    // Find ONE transaction by its id. Return Optional.empty() if not found.
    // Appends "WHERE t.id = ?" to BASE_SELECT and wraps result in Optional.

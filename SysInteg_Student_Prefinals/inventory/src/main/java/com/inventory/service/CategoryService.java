@@ -31,6 +31,10 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
+    public List<Category> searchCategories(String keyword) {
+        return categoryRepository.searchByKeyword(keyword);
+    }
+
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Return a single category wrapped in Optional (it may not exist).
     public Optional<Category> getCategoryById(Long id) {

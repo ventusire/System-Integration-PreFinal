@@ -132,40 +132,6 @@ a {
     gap: 10px;
 }
 
-.nav-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.nav-search .ui-icon {
-    position: absolute;
-    left: 12px;
-    width: 0.95rem;
-    height: 0.95rem;
-    color: #64748b;
-    pointer-events: none;
-}
-
-.nav-search input {
-    width: 210px;
-    height: 36px;
-    padding: 0 12px 0 34px;
-    border: 1px solid #cbd5e1;
-    border-radius: var(--radius-control);
-    background: #f8fafc;
-    color: var(--text);
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-}
-
-.nav-search input:focus {
-    border-color: #8caac5;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(39, 115, 184, 0.12);
-}
-
 .stock-movement-btn {
     display: inline-flex;
     align-items: center;
@@ -1308,10 +1274,6 @@ button.icon-action {
     .navbar-actions {
         align-items: stretch;
         flex-direction: column;
-    }
-
-    .nav-search input {
-        width: 100%;
     }
 
     .stock-movement-btn {

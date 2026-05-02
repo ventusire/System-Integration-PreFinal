@@ -38,8 +38,13 @@ public class CategoryController {
     // ── EXAMPLE ─────────────────────────────────────────────────────────────
     // GET /categories — fetch all categories and pass them to the list template.
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("categories", categoryService.getAllCategories());
+    public String list(Model model, @RequestParam(required = false) String search) {
+        if (search != null && !search.isBlank()) {
+            model.addAttribute("categories", categoryService.searchCategories(search));
+            model.addAttribute("search", search);
+        } else {
+            model.addAttribute("categories", categoryService.getAllCategories());
+        }
         return "categories/list";
     }
 

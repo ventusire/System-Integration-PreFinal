@@ -63,6 +63,11 @@ public class StockTransactionService {
         return transactionRepository.findAll();
     }
 
+    // Search transactions by product, SKU, type, or reason.
+    public List<StockTransaction> searchTransactions(String keyword) {
+        return transactionRepository.searchByKeyword(keyword);
+    }
+
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Return only the 10 most recent transactions (used on the dashboard).
     // RECENT FIX (commit c293b42): this was the exact method that surfaced the
