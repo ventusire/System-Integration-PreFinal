@@ -28,6 +28,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/transactions")
 public class TransactionController {
 
+    private static final String PRODUCT_NOT_FOUND = "Product not Found";
+
     @Autowired private StockTransactionService transactionService;
     @Autowired private ProductService productService;
 
@@ -58,11 +60,15 @@ public class TransactionController {
     // On failure (RuntimeException) → flash the exception message as "error".
     // Redirect to /transactions either way.
     @PostMapping("/stock-in")
-    public String stockIn(@RequestParam Long productId,
+    public String stockIn(@RequestParam(required = false) Long productId,
                           @RequestParam int quantity,
                           @RequestParam(required = false) String reason,
                           RedirectAttributes flash) {
         try {
+            if (productId == null) {
+                throw new RuntimeException(PRODUCT_NOT_FOUND);
+            }
+
             // COMPLETED: Attempt to add stock via service. The service handles the business
             // logic: creates a stock transaction record and updates product quantity.
             // If product not found or other error occurs, the service throws RuntimeException.
@@ -85,11 +91,15 @@ public class TransactionController {
     // Same pattern as stock-in but calls transactionService.removeStock().
     // Remember: removeStock throws if there is insufficient stock — catch it!
     @PostMapping("/stock-out")
-    public String stockOut(@RequestParam Long productId,
+    public String stockOut(@RequestParam(required = false) Long productId,
                            @RequestParam int quantity,
                            @RequestParam(required = false) String reason,
                            RedirectAttributes flash) {
         try {
+            if (productId == null) {
+                throw new RuntimeException(PRODUCT_NOT_FOUND);
+            }
+
             // COMPLETED: Attempt to remove stock via service. The service validates that
             // the product has sufficient stock before creating a stock-out transaction.
             // If stock is insufficient, the service throws a RuntimeException with a

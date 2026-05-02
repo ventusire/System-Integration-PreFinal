@@ -30,13 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const productId = productSelect?.value.trim() || '';
             const quantity = Number(quantityInput?.value || 0);
 
-            if (!productId) {
-                event.preventDefault();
-                alert('Please select a product.');
-                productSelect?.focus();
-                return;
-            }
-
             if (!Number.isInteger(quantity) || quantity < 1) {
                 event.preventDefault();
                 alert('Please enter a quantity of at least 1.');
