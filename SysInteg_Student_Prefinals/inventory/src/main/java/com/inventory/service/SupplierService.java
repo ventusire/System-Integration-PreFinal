@@ -27,26 +27,26 @@ public class SupplierService {
 
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     public Optional<Supplier> getSupplierById(Long id) {
-        // TODO: return supplierRepository.findById(id)
-        throw new UnsupportedOperationException("TODO 1 — getSupplierById not implemented yet");
+        // Calls the repository to retrieve a supplier matching the given ID
+        return supplierRepository.findById(id);
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     public Supplier saveSupplier(Supplier supplier) {
-        // TODO: return supplierRepository.save(supplier)
-        throw new UnsupportedOperationException("TODO 2 — saveSupplier not implemented yet");
+        // Calls the repository to save (insert or update) the supplier details and returns the saved entity
+        return supplierRepository.save(supplier);
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     public void deleteSupplier(Long id) {
-        // TODO: call supplierRepository.deleteById(id)
-        throw new UnsupportedOperationException("TODO 3 — deleteSupplier not implemented yet");
+        // Calls the repository to remove the supplier with the specified ID
+        supplierRepository.deleteById(id);
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Return true if the given email is already registered to another supplier.
     public boolean isEmailTaken(String email) {
-        // TODO: return supplierRepository.existsByEmail(email)
-        throw new UnsupportedOperationException("TODO 4 — isEmailTaken not implemented yet");
+        // Calls the repository to check if any supplier already exists with this exact email
+        return supplierRepository.existsByEmail(email);
     }
 }

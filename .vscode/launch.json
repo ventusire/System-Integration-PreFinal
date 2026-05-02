@@ -4,7 +4,7 @@
             "type": "java",
             "name": "Spring Boot-InventoryApplication<inventory>",
             "request": "launch",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/SysInteg_Student_Prefinals/inventory",
             "mainClass": "com.inventory.InventoryApplication",
             "projectName": "inventory",
             "args": "",

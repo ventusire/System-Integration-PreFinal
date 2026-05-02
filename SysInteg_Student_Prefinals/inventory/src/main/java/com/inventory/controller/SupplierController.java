@@ -12,18 +12,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * ┌─────────────────────────────────────────────────────────────────┐
- * │  GROUP 2 — SupplierController                                   │
- * │                                                                 │
- * │  ROUTES                                                         │
- * │    GET  /suppliers              → list all suppliers            │
- * │    GET  /suppliers/new          → blank form                    │
- * │    GET  /suppliers/edit/{id}    → pre-filled form               │
- * │    POST /suppliers/save         → save supplier                 │
- * │    POST /suppliers/delete/{id}  → delete supplier               │
- * │                                                                 │
- * │  TEMPLATES                                                      │
- * │    suppliers/list.html                                          │
- * │    suppliers/form.html                                          │
+ * │ GROUP 2 — SupplierController │
+ * │ │
+ * │ ROUTES │
+ * │ GET /suppliers → list all suppliers │
+ * │ GET /suppliers/new → blank form │
+ * │ GET /suppliers/edit/{id} → pre-filled form │
+ * │ POST /suppliers/save → save supplier │
+ * │ POST /suppliers/delete/{id} → delete supplier │
+ * │ │
+ * │ TEMPLATES │
+ * │ suppliers/list.html │
+ * │ suppliers/form.html │
  * └─────────────────────────────────────────────────────────────────┘
  */
 @Controller
@@ -33,44 +33,60 @@ public class SupplierController {
     @Autowired
     private SupplierService supplierService;
 
-    // ── EXAMPLE ─────────────────────────────────────────────────────────────
+    // Get All Suppliers list
     @GetMapping
     public String list(Model model) {
         model.addAttribute("suppliers", supplierService.getAllSuppliers());
         return "suppliers/list";
     }
 
-    // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Show blank add-supplier form.
     @GetMapping("/new")
     public String newForm(Model model) {
-        // TODO: model.addAttribute("supplier", new Supplier());
-        //       return "suppliers/form";
-        throw new UnsupportedOperationException("TODO 1 — newForm not implemented yet");
+        model.addAttribute("supplier", new Supplier());
+        return "suppliers/form";
     }
 
-    // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Load supplier by id, put in model, show form.
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
-        // TODO: load supplier and add to model, return "suppliers/form"
-        throw new UnsupportedOperationException("TODO 2 — editForm not implemented yet");
+        Supplier supplier = supplierService.getSupplierById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid supplier Id:" + id));
+        model.addAttribute("supplier", supplier);
+        return "suppliers/form";
     }
 
-    // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Validate, save, redirect with flash message.
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute Supplier supplier, BindingResult result,
-                       RedirectAttributes flash) {
-        // TODO: handle errors → save → flash → redirect
-        throw new UnsupportedOperationException("TODO 3 — save not implemented yet");
+            RedirectAttributes flash) {
+        if (result.hasErrors()) {
+            return "suppliers/form";
+        }
+
+        // Check email uniqueness
+        if (supplier.getId() == null && supplierService.isEmailTaken(supplier.getEmail())) {
+            result.rejectValue("email", "error.supplier", "Email is already taken");
+            return "suppliers/form";
+        } else if (supplier.getId() != null) {
+            Supplier existing = supplierService.getSupplierById(supplier.getId()).orElse(null);
+            if (existing != null && !existing.getEmail().equals(supplier.getEmail())
+                    && supplierService.isEmailTaken(supplier.getEmail())) {
+                result.rejectValue("email", "error.supplier", "Email is already taken");
+                return "suppliers/form";
+            }
+        }
+
+        supplierService.saveSupplier(supplier);
+        flash.addFlashAttribute("success", "Supplier successfully saved!");
+        return "redirect:/suppliers";
     }
 
-    // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Delete supplier, redirect with flash message.
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes flash) {
-        // TODO: delete → flash → redirect
-        throw new UnsupportedOperationException("TODO 4 — delete not implemented yet");
+        supplierService.deleteSupplier(id);
+        flash.addFlashAttribute("success", "Supplier deleted successfully!");
+        return "redirect:/suppliers";
     }
 }

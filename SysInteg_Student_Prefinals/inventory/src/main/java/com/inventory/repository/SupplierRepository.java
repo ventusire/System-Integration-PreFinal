@@ -63,29 +63,38 @@ public class SupplierRepository {
     // ── TODO 1 ──────────────────────────────────────────────────────────────
     // Find ONE supplier by its id. Return Optional.empty() if not found.
     public Optional<Supplier> findById(Long id) {
-        // TODO: SELECT ... WHERE id = ?  then wrap in Optional
-        throw new UnsupportedOperationException("TODO 1 — findById not implemented yet");
+        // SQL query to select all columns for a specific supplier by ID
+        String sql = "SELECT id, name, email, phone, address FROM suppliers WHERE id = ?";
+        // Execute the query, map the result, and use streams to safely return an Optional if empty
+        return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
     }
 
     // ── TODO 2 ──────────────────────────────────────────────────────────────
     // Find ONE supplier by their exact email address.
     public Optional<Supplier> findByEmail(String email) {
-        // TODO: SELECT ... WHERE email = ?
-        throw new UnsupportedOperationException("TODO 2 — findByEmail not implemented yet");
+        // SQL query to select all columns for a specific supplier by their exact email
+        String sql = "SELECT id, name, email, phone, address FROM suppliers WHERE email = ?";
+        // Execute the query, map the result, and wrap in Optional
+        return jdbcTemplate.query(sql, rowMapper, email).stream().findFirst();
     }
 
     // ── TODO 3 ──────────────────────────────────────────────────────────────
     // Return true if a supplier with the given email already exists.
     public boolean existsByEmail(String email) {
-        // TODO: SELECT COUNT(*) FROM suppliers WHERE email = ?
-        throw new UnsupportedOperationException("TODO 3 — existsByEmail not implemented yet");
+        // SQL query to count occurrences of the given email
+        String sql = "SELECT COUNT(*) FROM suppliers WHERE email = ?";
+        // Execute the query to count and return true if count is greater than zero
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, email);
+        return count != null && count > 0;
     }
 
     // ── TODO 4 ──────────────────────────────────────────────────────────────
     // Find all suppliers whose name contains the keyword (case-insensitive).
     public List<Supplier> searchByKeyword(String keyword) {
-        // TODO: LOWER(name) LIKE LOWER(?) — wrap keyword with %...%
-        throw new UnsupportedOperationException("TODO 4 — searchByKeyword not implemented yet");
+        // SQL query to match names case-insensitively using LIKE
+        String sql = "SELECT id, name, email, phone, address FROM suppliers WHERE LOWER(name) LIKE LOWER(?) ORDER BY name ASC";
+        // Wrap the keyword with wildcards (%) and execute the query
+        return jdbcTemplate.query(sql, rowMapper, "%" + keyword + "%");
     }
 
     // ── TODO 5 ──────────────────────────────────────────────────────────────
@@ -108,7 +117,10 @@ public class SupplierRepository {
         } else {
             // ── TODO: UPDATE ─────────────────────────────────────────────
             // Columns to update: name, email, phone, address — filter by id
-            throw new UnsupportedOperationException("TODO 5 — UPDATE in save() not implemented yet");
+            // SQL query to update an existing supplier's details matching by ID
+            String sql = "UPDATE suppliers SET name = ?, email = ?, phone = ?, address = ? WHERE id = ?";
+            // Execute the update query passing the supplier's fields in the correct order
+            jdbcTemplate.update(sql, supplier.getName(), supplier.getEmail(), supplier.getPhone(), supplier.getAddress(), supplier.getId());
         }
         return supplier;
     }
@@ -116,14 +128,19 @@ public class SupplierRepository {
     // ── TODO 6 ──────────────────────────────────────────────────────────────
     // Delete a supplier by its id.
     public void deleteById(Long id) {
-        // TODO: DELETE FROM suppliers WHERE id = ?
-        throw new UnsupportedOperationException("TODO 6 — deleteById not implemented yet");
+        // SQL query to delete a supplier record where the ID matches
+        String sql = "DELETE FROM suppliers WHERE id = ?";
+        // Execute the update/delete query
+        jdbcTemplate.update(sql, id);
     }
 
     // ── TODO 7 (BONUS) ──────────────────────────────────────────────────────
     // Return the total count of all suppliers.
     public long count() {
-        // TODO: SELECT COUNT(*) FROM suppliers
-        throw new UnsupportedOperationException("TODO 7 — count not implemented yet");
+        // SQL query to get the total number of records in the suppliers table
+        String sql = "SELECT COUNT(*) FROM suppliers";
+        // Retrieve the count result
+        Long count = jdbcTemplate.queryForObject(sql, Long.class);
+        return count != null ? count : 0L;
     }
 }
